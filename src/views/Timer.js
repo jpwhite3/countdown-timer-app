@@ -1,12 +1,10 @@
 import React from 'react'
-import { CContainer, CCol, CRow, CImage } from '@coreui/react'
+import { CContainer, CCol, CRow } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilAlarm } from '@coreui/icons'
 import Countdown from 'react-countdown'
 import QRCode from 'react-qr-code'
 import 'react-datetime/css/react-datetime.css'
-// import logo from '../assets/images/level-up-arrow-logo-gold.png'
-import logo from '../assets/images/level-up-coin-spinning.gif'
 
 const CountdownView = () => {
   const queryString = require('query-string')
@@ -66,10 +64,6 @@ const CountdownView = () => {
       <h1>{title}</h1>
       <hr />
       <Countdown date={selected_time} renderer={renderer} />
-      <hr />
-      <div className="fs-1">
-        <CImage src={logo} width={170} height={170} />
-      </div>
       <hr />
       <QRCode value={window.location.href} />
     </div>
