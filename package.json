@@ -1,14 +1,14 @@
 {
-  "name": "@jpwhite3/countdown-timer-app",
-  "version": "0.1.0",
+  "name": "@level-up-program-dev/countdown-timer-app",
+  "version": "0.1.1",
   "description": "Simple shared countdown timer webapp",
   "homepage": ".",
   "bugs": {
-    "url": "https://github.com/jpwhite3/countdown-timer-app/issues"
+    "url": "https://github.com/level-up-program-dev/countdown-timer-app/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:jpwhite3/countdown-timer-app.git"
+    "url": "git@github.com:level-up-program-dev/countdown-timer-app.git"
   },
   "license": "MIT",
   "author": "JP White (https://github.com/jpwhite3)",

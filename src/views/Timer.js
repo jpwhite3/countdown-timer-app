@@ -1,10 +1,12 @@
 import React from 'react'
-import { CCol, CRow, CContainer } from '@coreui/react'
+import { CContainer, CCol, CRow, CImage } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilAlarm } from '@coreui/icons'
 import Countdown from 'react-countdown'
 import QRCode from 'react-qr-code'
 import 'react-datetime/css/react-datetime.css'
+// import logo from '../assets/images/level-up-arrow-logo-gold.png'
+import logo from '../assets/images/level-up-coin-spinning.gif'
 
 const CountdownView = () => {
   const queryString = require('query-string')
@@ -13,7 +15,7 @@ const CountdownView = () => {
   const until = queryParams.until || new Date().toISOString()
   const selected_time = new Date(Date.parse(until)) || new Date()
 
-  // Random component
+  // What to show when time has elapsed
   const Completionist = () => (
     <div className="text-danger fs-1">
       <CIcon icon={cilAlarm} size="xxl" />
@@ -22,7 +24,7 @@ const CountdownView = () => {
   )
 
   // Renderer callback with condition
-  const renderer = ({ hours, minutes, seconds, completed }) => {
+  const renderer = ({ days, hours, minutes, seconds, completed }) => {
     if (completed) {
       // Render a completed state
       return <Completionist />
@@ -33,7 +35,7 @@ const CountdownView = () => {
           <CContainer>
             <CRow className="fs-1 justify-content-center">
               <CCol xl={1} md={2} xs={4}>
-                {hours}
+                {hours + 24 * days}
               </CCol>
               <CCol xl={1} md={2} xs={4}>
                 {minutes}
@@ -64,6 +66,10 @@ const CountdownView = () => {
       <h1>{title}</h1>
       <hr />
       <Countdown date={selected_time} renderer={renderer} />
+      <hr />
+      <div className="fs-1">
+        <CImage src={logo} width={170} height={170} />
+      </div>
       <hr />
       <QRCode value={window.location.href} />
     </div>
