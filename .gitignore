@@ -9,6 +9,7 @@ package-lock.json
 
 # production
 /build
+/dist
 
 # misc
 .eslintcache

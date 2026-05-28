@@ -20,48 +20,43 @@ This is a simple webapp built with React and CoreUI. It allows you to set a date
 - [Download the latest release](https://github.com/jpwhite3/countdown-timer-app/archive/refs/heads/main.zip)
 - Clone the repo: `git clone https://github.com/jpwhite3/countdown-timer-app.git`
 
-### Instalation
+### Installation
 
 ```bash
 $ npm install
-```
-
-or
-
-```bash
-$ yarn install
 ```
 
 ### Basic usage
 
 ```bash
 # dev server with hot reload at http://localhost:3000
-$ npm start
-```
-
-or
-
-```bash
-# dev server with hot reload at http://localhost:3000
-$ yarn start
+$ npm run dev
 ```
 
 Navigate to [http://localhost:3000](http://localhost:3000). The app will automatically reload if you change any of the source files.
 
 #### Build
 
-Run `build` to build the project. The build artifacts will be stored in the `build/` directory.
+Run `build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
 ```bash
 # build for production with minification
 $ npm run build
 ```
 
-or
+#### Preview
+
+After building, you can locally preview the production bundle:
 
 ```bash
-# build for production with minification
-$ yarn build
+$ npm run preview
+```
+
+#### Test
+
+```bash
+# run unit tests (Vitest)
+$ npm test
 ```
 
 ## Copyright and License
