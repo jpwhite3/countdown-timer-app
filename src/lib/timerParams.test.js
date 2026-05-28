@@ -345,20 +345,19 @@ describe('parseDim', () => {
 })
 
 describe('effectiveDim', () => {
-  it('returns the explicit value when provided (including 0)', () => {
+  it('returns the explicit value when provided (including 0 as the off switch)', () => {
     expect(effectiveDim({ dim: 0.6 })).toBe(0.6)
-    expect(effectiveDim({ dim: 0, bgUrl: 'https://x/y.png' })).toBe(0)
-    expect(effectiveDim({ dim: 0.5, bgUrl: 'https://x/y.png' })).toBe(0.5)
+    expect(effectiveDim({ dim: 0 })).toBe(0)
+    expect(effectiveDim({ dim: 0.5 })).toBe(0.5)
   })
 
-  it('defaults to 0 when an asset is present and dim is absent', () => {
-    expect(effectiveDim({ dim: null, bgUrl: 'https://x/y.png' })).toBe(0)
-    expect(effectiveDim({ dim: null, videoBgUrl: 'https://x/y.mp4' })).toBe(0)
-  })
-
-  it('defaults to 0.35 when no asset and dim is absent', () => {
-    expect(effectiveDim({ dim: null })).toBe(0.35)
+  it('defaults to 0.35 when dim is absent, regardless of background assets', () => {
     expect(effectiveDim({})).toBe(0.35)
+    expect(effectiveDim({ dim: null })).toBe(0.35)
+    // Background assets used to suppress the scrim; the new default is to
+    // keep it on (callers can pass dim: 0 to opt out).
+    expect(effectiveDim({ dim: null, bgUrl: 'https://x/y.png' })).toBe(0.35)
+    expect(effectiveDim({ dim: null, videoBgUrl: 'https://x/y.mp4' })).toBe(0.35)
   })
 })
 

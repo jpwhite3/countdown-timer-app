@@ -167,15 +167,22 @@ export function parseTimerParams(search, { now = Date.now() } = {}) {
 }
 
 /**
- * Resolve the effective dim opacity. Explicit value wins; otherwise a
- * background asset suppresses the default scrim (the user opted in to a
- * specific look), and a plain-color page gets a mild 35% scrim to soften
- * bright/clashing color choices for text contrast.
+ * Default dim opacity applied when the URL omits the `dim` parameter.
+ * Picked to soften busy backgrounds enough for text contrast without
+ * fully washing out the chosen background color or asset.
  */
-export function effectiveDim({ dim, bgUrl, videoBgUrl } = {}) {
+export const DEFAULT_DIM = 0.35
+
+/**
+ * Resolve the effective dim opacity. An explicit numeric value always wins
+ * (including 0, which is the documented way to disable the scrim entirely).
+ * When the URL omits `dim`, fall back to DEFAULT_DIM so plain-color and
+ * image/video backgrounds both get a baseline contrast layer — users who
+ * want full control can opt out with `dim=0`.
+ */
+export function effectiveDim({ dim } = {}) {
   if (typeof dim === 'number') return dim
-  if (bgUrl || videoBgUrl) return 0
-  return 0.35
+  return DEFAULT_DIM
 }
 
 /**

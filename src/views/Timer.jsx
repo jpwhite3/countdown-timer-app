@@ -5,6 +5,7 @@ import { parseTimerParams, toAbsoluteShareSearch, effectiveDim } from '../lib/ti
 import { useCountdown } from '../lib/useCountdown'
 import { useTimerCues } from '../lib/useTimerCues'
 import TimerScreen from '../components/TimerScreen'
+import AudioGate from '../components/AudioGate'
 
 const QRCode = ReactQRCode.default ?? ReactQRCode
 
@@ -78,21 +79,21 @@ const TimerView = () => {
     <QRCode value={shareHref} size={120} bgColor="#ffffff" fgColor="#000000" />
   ) : null
 
-  const dim =
-    flashing || critical
-      ? 0
-      : effectiveDim({ dim: params.dim, bgUrl: params.bgUrl, videoBgUrl: params.videoBgUrl })
+  const dim = flashing || critical ? 0 : effectiveDim({ dim: params.dim })
 
   return (
-    <TimerScreen
-      title={params.title}
-      countdown={countdown}
-      layout={params.layout}
-      bgUrl={flashing || critical ? null : params.bgUrl}
-      videoBgUrl={flashing || critical ? null : params.videoBgUrl}
-      dim={dim}
-      qrSlot={qrSlot}
-    />
+    <>
+      <TimerScreen
+        title={params.title}
+        countdown={countdown}
+        layout={params.layout}
+        bgUrl={flashing || critical ? null : params.bgUrl}
+        videoBgUrl={flashing || critical ? null : params.videoBgUrl}
+        dim={dim}
+        qrSlot={qrSlot}
+      />
+      <AudioGate audioEnabled={params.audio} />
+    </>
   )
 }
 

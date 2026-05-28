@@ -22,6 +22,16 @@ export function unlockAudio() {
 }
 
 /**
+ * Returns the current state of the shared AudioContext without creating one.
+ * Used by UI gates that want to know whether audio is already unlocked
+ * (`'running'`) versus needing a user gesture (`'suspended'` or `'unstarted'`).
+ */
+export function getAudioState() {
+  if (!sharedCtx) return 'unstarted'
+  return sharedCtx.state
+}
+
+/**
  * Play a short synthesized tone. Silently no-ops if Web Audio is unavailable
  * or the context hasn't been unlocked yet (rather than throwing).
  */

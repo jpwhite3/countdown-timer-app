@@ -21,7 +21,7 @@ import {
   CNavLink,
   CRow,
 } from '@coreui/react'
-import { buildTimerSearch } from '../lib/timerParams'
+import { buildTimerSearch, DEFAULT_DIM } from '../lib/timerParams'
 import { unlockAudio } from '../lib/audioCues'
 
 const QUICK_MINUTES = [5, 10, 15, 30, 60]
@@ -57,10 +57,18 @@ const Builder = () => {
   const [textColor, setTextColor] = useState('#f5f5f5')
   const [bgUrl, setBgUrl] = useState('')
   const [layout, setLayout] = useState('')
+  const [dimEnabled, setDimEnabled] = useState(true)
+  const [dimIntensity, setDimIntensity] = useState(DEFAULT_DIM)
   const [flash, setFlash] = useState(false)
   const [audio, setAudio] = useState(false)
   const [overtime, setOvertime] = useState(false)
   const [copyState, setCopyState] = useState('idle')
+
+  // Only emit `dim` when it differs from the URL default. The disabled case
+  // emits `dim=0` explicitly (that's the documented off switch); the
+  // enabled-at-default-intensity case omits the param entirely so URLs stay
+  // tidy when the user accepted the defaults.
+  const dimParam = !dimEnabled ? 0 : dimIntensity === DEFAULT_DIM ? undefined : dimIntensity
 
   const search = useMemo(
     () =>
@@ -73,6 +81,7 @@ const Builder = () => {
         textColor,
         bgUrl,
         layout: layout || undefined,
+        dim: dimParam,
         flash,
         audio,
         overtime,
@@ -86,6 +95,7 @@ const Builder = () => {
       textColor,
       bgUrl,
       layout,
+      dimParam,
       flash,
       audio,
       overtime,
@@ -318,6 +328,40 @@ const Builder = () => {
                   <option value="mobile">Mobile</option>
                   <option value="widescreen">Widescreen</option>
                 </CFormSelect>
+              </CCol>
+            </CRow>
+
+            <CRow className="mb-3">
+              <CCol>
+                <CFormCheck
+                  id="dim-enabled"
+                  label="Dim background for text contrast"
+                  checked={dimEnabled}
+                  onChange={(e) => setDimEnabled(e.target.checked)}
+                />
+                <div className="form-text mb-2">
+                  Adds a semi-transparent black layer over the background to keep the timer
+                  readable. Turn off for full control over the background appearance.
+                </div>
+                {dimEnabled && (
+                  <CInputGroup size="sm" style={{ maxWidth: 360 }}>
+                    <CInputGroupText>Intensity</CInputGroupText>
+                    <input
+                      type="range"
+                      aria-label="Dim intensity"
+                      min="0.05"
+                      max="0.9"
+                      step="0.05"
+                      value={dimIntensity}
+                      onChange={(e) => setDimIntensity(Number(e.target.value))}
+                      className="form-control"
+                      style={{ padding: '0.5rem 0.75rem' }}
+                    />
+                    <CInputGroupText style={{ minWidth: 56, justifyContent: 'center' }}>
+                      {Math.round(dimIntensity * 100)}%
+                    </CInputGroupText>
+                  </CInputGroup>
+                )}
               </CCol>
             </CRow>
 
