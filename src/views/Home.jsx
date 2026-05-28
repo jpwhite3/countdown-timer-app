@@ -22,6 +22,7 @@ import {
   CRow,
 } from '@coreui/react'
 import { buildTimerSearch } from '../lib/timerParams'
+import { unlockAudio } from '../lib/audioCues'
 
 const QUICK_MINUTES = [5, 10, 15, 30, 60]
 
@@ -102,6 +103,10 @@ const Builder = () => {
 
   const start = () => {
     if (!canStart) return
+    // Unlock the Web Audio context inside this user gesture so the timer
+    // page can play chimes/ticks without needing another tap. The
+    // AudioContext singleton survives the hash-route navigation.
+    if (audio) unlockAudio()
     navigate(`/timer${search ? '?' + search : ''}`)
   }
 
