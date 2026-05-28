@@ -124,6 +124,21 @@ export function parseBoolParam(value) {
 }
 
 /**
+ * Parse the `dim` URL parameter to a number in [0, 1], or `null` when the
+ * param is absent / unparseable so the caller can apply an asset-aware
+ * default. Out-of-range values are clamped rather than rejected so a
+ * stray `dim=1.5` still produces something sensible.
+ */
+export function parseDim(value) {
+  if (value == null || value === '') return null
+  const n = Number(value)
+  if (!Number.isFinite(n)) return null
+  if (n <= 0) return 0
+  if (n >= 1) return 1
+  return n
+}
+
+/**
  * Parse a URL search string (without the leading `?`) into the timer view's
  * resolved props. Anything missing or invalid falls back to a default; the
  * only hard failure is the absence of a usable target time.
@@ -143,11 +158,24 @@ export function parseTimerParams(search, { now = Date.now() } = {}) {
     bgUrl: safeUrl(params.get('bg_url')),
     videoBgUrl: safeUrl(params.get('video_bg_url')),
     layout: parseLayout(params.get('layout')),
+    dim: parseDim(params.get('dim')),
     flash: parseBoolParam(params.get('enable_flash')),
     audio: parseBoolParam(params.get('enable_audio')),
     overtime: parseBoolParam(params.get('enable_overtime')),
     error: target ? null : 'missing-time',
   }
+}
+
+/**
+ * Resolve the effective dim opacity. Explicit value wins; otherwise a
+ * background asset suppresses the default scrim (the user opted in to a
+ * specific look), and a plain-color page gets a mild 35% scrim to soften
+ * bright/clashing color choices for text contrast.
+ */
+export function effectiveDim({ dim, bgUrl, videoBgUrl } = {}) {
+  if (typeof dim === 'number') return dim
+  if (bgUrl || videoBgUrl) return 0
+  return 0.35
 }
 
 /**
@@ -165,6 +193,7 @@ export function buildTimerSearch({
   bgUrl,
   videoBgUrl,
   layout,
+  dim,
   flash,
   audio,
   overtime,
@@ -191,6 +220,11 @@ export function buildTimerSearch({
   if (videoBgUrl && videoBgUrl.trim()) params.set('video_bg_url', videoBgUrl.trim())
 
   if (layout && VALID_LAYOUTS.has(layout)) params.set('layout', layout)
+
+  if (typeof dim === 'number' && Number.isFinite(dim)) {
+    const clamped = Math.max(0, Math.min(1, dim))
+    params.set('dim', String(Math.round(clamped * 100) / 100))
+  }
 
   if (flash) params.set('enable_flash', '1')
   if (audio) params.set('enable_audio', '1')

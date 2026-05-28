@@ -43,7 +43,5 @@ export function playTone({ frequency = 880, duration = 200, volume = 0.2, type =
 }
 
 export const Cues = {
-  warning: () => playTone({ frequency: 880, duration: 250, type: 'sine' }),
-  tick: () => playTone({ frequency: 1320, duration: 80, volume: 0.18, type: 'square' }),
   done: () => playTone({ frequency: 440, duration: 900, volume: 0.25, type: 'sawtooth' }),
 }

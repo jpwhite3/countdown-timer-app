@@ -330,7 +330,7 @@ const Builder = () => {
                 />
                 <CFormCheck
                   id="enable-audio"
-                  label="Audio cues at 1:00, 0:30, every second in the final 10, and a chime at zero"
+                  label="Play a chime when the timer reaches zero"
                   checked={audio}
                   onChange={(e) => setAudio(e.target.checked)}
                 />

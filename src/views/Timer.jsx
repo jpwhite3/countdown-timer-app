@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import ReactQRCode from 'react-qr-code'
-import { parseTimerParams, toAbsoluteShareSearch } from '../lib/timerParams'
+import { parseTimerParams, toAbsoluteShareSearch, effectiveDim } from '../lib/timerParams'
 import { useCountdown } from '../lib/useCountdown'
 import { useTimerCues } from '../lib/useTimerCues'
 import TimerScreen from '../components/TimerScreen'
@@ -78,6 +78,11 @@ const TimerView = () => {
     <QRCode value={shareHref} size={120} bgColor="#ffffff" fgColor="#000000" />
   ) : null
 
+  const dim =
+    flashing || critical
+      ? 0
+      : effectiveDim({ dim: params.dim, bgUrl: params.bgUrl, videoBgUrl: params.videoBgUrl })
+
   return (
     <TimerScreen
       title={params.title}
@@ -85,6 +90,7 @@ const TimerView = () => {
       layout={params.layout}
       bgUrl={flashing || critical ? null : params.bgUrl}
       videoBgUrl={flashing || critical ? null : params.videoBgUrl}
+      dim={dim}
       qrSlot={qrSlot}
     />
   )

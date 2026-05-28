@@ -6,6 +6,8 @@ import {
   toAbsoluteShareSearch,
   inferMediaKind,
   parseBoolParam,
+  parseDim,
+  effectiveDim,
 } from './timerParams'
 
 describe('normalizeHex', () => {
@@ -322,5 +324,72 @@ describe('bool params in parseTimerParams + buildTimerSearch', () => {
   it('omits flags when false', () => {
     const s = buildTimerSearch({ mode: 'minutes', minutes: '5', flash: false })
     expect(new URLSearchParams(s).has('enable_flash')).toBe(false)
+  })
+})
+
+describe('parseDim', () => {
+  it('returns null when absent or unparseable', () => {
+    expect(parseDim(null)).toBeNull()
+    expect(parseDim(undefined)).toBeNull()
+    expect(parseDim('')).toBeNull()
+    expect(parseDim('huh')).toBeNull()
+  })
+
+  it('clamps to [0, 1]', () => {
+    expect(parseDim('0')).toBe(0)
+    expect(parseDim('1')).toBe(1)
+    expect(parseDim('0.5')).toBe(0.5)
+    expect(parseDim('-3')).toBe(0)
+    expect(parseDim('99')).toBe(1)
+  })
+})
+
+describe('effectiveDim', () => {
+  it('returns the explicit value when provided (including 0)', () => {
+    expect(effectiveDim({ dim: 0.6 })).toBe(0.6)
+    expect(effectiveDim({ dim: 0, bgUrl: 'https://x/y.png' })).toBe(0)
+    expect(effectiveDim({ dim: 0.5, bgUrl: 'https://x/y.png' })).toBe(0.5)
+  })
+
+  it('defaults to 0 when an asset is present and dim is absent', () => {
+    expect(effectiveDim({ dim: null, bgUrl: 'https://x/y.png' })).toBe(0)
+    expect(effectiveDim({ dim: null, videoBgUrl: 'https://x/y.mp4' })).toBe(0)
+  })
+
+  it('defaults to 0.35 when no asset and dim is absent', () => {
+    expect(effectiveDim({ dim: null })).toBe(0.35)
+    expect(effectiveDim({})).toBe(0.35)
+  })
+})
+
+describe('dim in parseTimerParams + buildTimerSearch', () => {
+  const NOW = Date.parse('2026-06-01T12:00:00Z')
+
+  it('parses dim from URL into a clamped number', () => {
+    expect(parseTimerParams('minutes=1&dim=0.5', { now: NOW }).dim).toBe(0.5)
+    expect(parseTimerParams('minutes=1&dim=-2', { now: NOW }).dim).toBe(0)
+    expect(parseTimerParams('minutes=1&dim=99', { now: NOW }).dim).toBe(1)
+    expect(parseTimerParams('minutes=1', { now: NOW }).dim).toBeNull()
+  })
+
+  it('builder emits dim rounded to 2 decimal places', () => {
+    const s = buildTimerSearch({ mode: 'minutes', minutes: '5', dim: 0.3456 })
+    expect(new URLSearchParams(s).get('dim')).toBe('0.35')
+  })
+
+  it('builder omits dim when undefined or non-numeric', () => {
+    expect(
+      new URLSearchParams(buildTimerSearch({ mode: 'minutes', minutes: '5' })).has('dim'),
+    ).toBe(false)
+    expect(
+      new URLSearchParams(buildTimerSearch({ mode: 'minutes', minutes: '5', dim: 'abc' })).has(
+        'dim',
+      ),
+    ).toBe(false)
+  })
+
+  it('builder emits dim=0 explicitly (different from absent)', () => {
+    const s = buildTimerSearch({ mode: 'minutes', minutes: '5', dim: 0 })
+    expect(new URLSearchParams(s).get('dim')).toBe('0')
   })
 })

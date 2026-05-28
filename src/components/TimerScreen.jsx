@@ -20,12 +20,20 @@ function useResolvedLayout(lockedLayout) {
   return lockedLayout ?? responsive
 }
 
-const TimerScreen = ({ title, countdown, layout: lockedLayout, bgUrl, videoBgUrl, qrSlot }) => {
+const TimerScreen = ({
+  title,
+  countdown,
+  layout: lockedLayout,
+  bgUrl,
+  videoBgUrl,
+  dim = 0,
+  qrSlot,
+}) => {
   const layout = useResolvedLayout(lockedLayout)
   const Layout = layout === 'mobile' ? MobileLayout : WidescreenLayout
   return (
     <>
-      <BackgroundMedia bgUrl={bgUrl} videoBgUrl={videoBgUrl} />
+      <BackgroundMedia bgUrl={bgUrl} videoBgUrl={videoBgUrl} dim={dim} />
       <Layout title={title} countdown={countdown} qrSlot={qrSlot} />
     </>
   )

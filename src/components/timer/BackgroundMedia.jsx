@@ -42,13 +42,29 @@ function chooseBackground({ bgUrl, videoBgUrl, prefersReducedMotion }) {
   return <ImageBg src={bgUrl} />
 }
 
-const BackgroundMedia = ({ bgUrl, videoBgUrl }) => {
+const dimOverlay = (opacity) => ({
+  position: 'fixed',
+  inset: 0,
+  background: `rgba(0,0,0,${opacity})`,
+  zIndex: 1,
+  pointerEvents: 'none',
+})
+
+const BackgroundMedia = ({ bgUrl, videoBgUrl, dim = 0 }) => {
   const prefersReducedMotion =
     typeof window !== 'undefined' &&
     window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-  return chooseBackground({ bgUrl, videoBgUrl, prefersReducedMotion })
+  const asset = chooseBackground({ bgUrl, videoBgUrl, prefersReducedMotion })
+  const showDim = dim > 0
+  if (!asset && !showDim) return null
+  return (
+    <>
+      {asset}
+      {showDim ? <div style={dimOverlay(dim)} /> : null}
+    </>
+  )
 }
 
 export default BackgroundMedia
