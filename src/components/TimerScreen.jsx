@@ -5,12 +5,15 @@ import WidescreenLayout from './timer/WidescreenLayout'
 
 function useResolvedLayout(lockedLayout) {
   const [responsive, setResponsive] = useState(() => {
-    if (typeof window === 'undefined') return 'widescreen'
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return 'widescreen'
+    }
     return window.matchMedia('(min-width: 768px)').matches ? 'widescreen' : 'mobile'
   })
 
   useEffect(() => {
     if (lockedLayout) return undefined
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return undefined
     const mq = window.matchMedia('(min-width: 768px)')
     const onChange = (e) => setResponsive(e.matches ? 'widescreen' : 'mobile')
     mq.addEventListener('change', onChange)

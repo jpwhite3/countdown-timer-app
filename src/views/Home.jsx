@@ -21,8 +21,10 @@ import {
   CNavLink,
   CRow,
 } from '@coreui/react'
-import { buildTimerSearch, DEFAULT_DIM } from '../lib/timerParams'
+import { buildTimerSearch, DEFAULT_DIM, effectiveDim } from '../lib/timerParams'
 import { unlockAudio } from '../lib/audioCues'
+import { useCountdown } from '../lib/useCountdown'
+import TimerPreview from '../components/TimerPreview'
 
 const QUICK_MINUTES = [5, 10, 15, 30, 60]
 
@@ -69,6 +71,36 @@ const Builder = () => {
   // enabled-at-default-intensity case omits the param entirely so URLs stay
   // tidy when the user accepted the defaults.
   const dimParam = !dimEnabled ? 0 : dimIntensity === DEFAULT_DIM ? undefined : dimIntensity
+
+  // Live preview state: synthesize a target so the preview always has
+  // something to show, even before the user types a valid input.
+  const previewTarget = useMemo(() => {
+    if (mode === 'minutes' && Number(minutes) > 0) {
+      return new Date(Date.now() + Number(minutes) * 60_000)
+    }
+    if (mode === 'timestamp') {
+      const iso = datetimeLocalToIso(datetimeLocal)
+      if (iso) return new Date(iso)
+    }
+    return new Date(Date.now() + 15 * 60_000)
+  }, [mode, minutes, datetimeLocal])
+
+  const previewCountdown = useCountdown(previewTarget, { allowOvertime: overtime })
+
+  const previewDim = effectiveDim({ dim: dimParam ?? null })
+
+  // Mirror the safeUrl filter that parseTimerParams applies in production,
+  // so a user typing a `javascript:` URL never reaches the <img>/<video>.
+  const previewBgUrl = useMemo(() => {
+    const v = (bgUrl || '').trim()
+    if (!v || typeof window === 'undefined') return null
+    try {
+      const u = new URL(v, window.location.origin)
+      return /^https?:$/.test(u.protocol) ? u.toString() : null
+    } catch {
+      return null
+    }
+  }, [bgUrl])
 
   const search = useMemo(
     () =>
@@ -150,6 +182,22 @@ const Builder = () => {
               copy the URL or click Start.
             </CCardText>
           )}
+
+          <div className="mb-4">
+            <CFormLabel className="fw-semibold">Preview</CFormLabel>
+            <TimerPreview
+              title={title}
+              countdown={previewCountdown}
+              bgColor={bgColor}
+              textColor={textColor}
+              bgUrl={previewBgUrl}
+              layout={layout}
+              dim={previewDim}
+            />
+            <div className="form-text text-center mt-2">
+              Updates live as you change settings. Audio, flash, and the QR code are omitted.
+            </div>
+          </div>
 
           <CNav variant="tabs" role="tablist" className="mb-3">
             <CNavItem>
