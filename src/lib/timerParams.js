@@ -1,5 +1,58 @@
 const VALID_LAYOUTS = new Set(['mobile', 'widescreen'])
 
+const VIDEO_EXTENSIONS = new Set([
+  'mp4',
+  'm4v',
+  'mov',
+  'webm',
+  'ogv',
+  'ogg',
+  'mkv',
+  'mpeg',
+  'mpg',
+  '3gp',
+])
+
+const IMAGE_EXTENSIONS = new Set([
+  'apng',
+  'avif',
+  'bmp',
+  'gif',
+  'ico',
+  'jpeg',
+  'jpg',
+  'jxl',
+  'png',
+  'svg',
+  'tif',
+  'tiff',
+  'webp',
+])
+
+/**
+ * Infer how to render a media URL based on its file extension.
+ * Returns `'video'` for known video container extensions, `'image'` for
+ * known image extensions (including animated formats like GIF/APNG/WebP/AVIF
+ * that play natively in <img>), and `'image'` as the safe default for
+ * extensionless or unrecognized URLs (since <img> degrades more gracefully
+ * than <video>).
+ */
+export function inferMediaKind(url) {
+  if (typeof url !== 'string' || !url.trim()) return null
+  let pathname
+  try {
+    pathname = new URL(url, 'http://_').pathname
+  } catch {
+    return 'image'
+  }
+  const dot = pathname.lastIndexOf('.')
+  if (dot < 0) return 'image'
+  const ext = pathname.slice(dot + 1).toLowerCase()
+  if (VIDEO_EXTENSIONS.has(ext)) return 'video'
+  if (IMAGE_EXTENSIONS.has(ext)) return 'image'
+  return 'image'
+}
+
 function expandShortHex(h) {
   return h
     .split('')

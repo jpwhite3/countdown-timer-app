@@ -4,6 +4,7 @@ import {
   buildTimerSearch,
   normalizeHex,
   toAbsoluteShareSearch,
+  inferMediaKind,
 } from './timerParams'
 
 describe('normalizeHex', () => {
@@ -206,5 +207,52 @@ describe('toAbsoluteShareSearch', () => {
   it('returns the original search when target is invalid', () => {
     expect(toAbsoluteShareSearch('minutes=15', null)).toBe('minutes=15')
     expect(toAbsoluteShareSearch('minutes=15', new Date('not a date'))).toBe('minutes=15')
+  })
+})
+
+describe('inferMediaKind', () => {
+  it('identifies common video extensions', () => {
+    for (const url of [
+      'https://example.com/x.mp4',
+      'https://example.com/x.M4V',
+      'https://example.com/x.webm',
+      'https://example.com/x.mov',
+      'https://example.com/x.ogv',
+      'https://example.com/x.mkv',
+    ]) {
+      expect(inferMediaKind(url)).toBe('video')
+    }
+  })
+
+  it('identifies common image extensions (including animated)', () => {
+    for (const url of [
+      'https://example.com/x.png',
+      'https://example.com/x.jpg',
+      'https://example.com/x.JPEG',
+      'https://example.com/x.gif',
+      'https://example.com/x.apng',
+      'https://example.com/x.webp',
+      'https://example.com/x.avif',
+      'https://example.com/x.svg',
+    ]) {
+      expect(inferMediaKind(url)).toBe('image')
+    }
+  })
+
+  it('ignores query strings and fragments when sniffing the extension', () => {
+    expect(inferMediaKind('https://example.com/clip.mp4?token=abc&v=2')).toBe('video')
+    expect(inferMediaKind('https://example.com/pic.gif#frag')).toBe('image')
+  })
+
+  it('falls back to image for extensionless or unknown URLs', () => {
+    expect(inferMediaKind('https://picsum.photos/1920/1080')).toBe('image')
+    expect(inferMediaKind('https://example.com/file.unknownext')).toBe('image')
+  })
+
+  it('returns null for empty/non-string input', () => {
+    expect(inferMediaKind('')).toBeNull()
+    expect(inferMediaKind('   ')).toBeNull()
+    expect(inferMediaKind(null)).toBeNull()
+    expect(inferMediaKind(undefined)).toBeNull()
   })
 })

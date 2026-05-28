@@ -1,4 +1,5 @@
 import React from 'react'
+import { inferMediaKind } from '../../lib/timerParams'
 
 const fill = {
   position: 'fixed',
@@ -18,31 +19,46 @@ const overlay = {
   pointerEvents: 'none',
 }
 
+const VideoBg = ({ src, poster }) => (
+  <video style={fill} src={src} poster={poster || undefined} autoPlay loop muted playsInline />
+)
+
+const ImageBg = ({ src }) => <img style={fill} src={src} alt="" />
+
+/**
+ * Resolve which element to render, honoring the user's media preferences.
+ * Returns either a React element or `null`.
+ *   - Explicit `videoBgUrl` always wins (with `bgUrl` as the poster).
+ *   - Otherwise, sniff `bgUrl` by extension and pick <video> or <img>.
+ *   - Under `prefers-reduced-motion`, prefer the still poster if we have one,
+ *     and skip video autoplay entirely.
+ */
+function chooseBackground({ bgUrl, videoBgUrl, prefersReducedMotion }) {
+  if (videoBgUrl) {
+    if (prefersReducedMotion) {
+      return bgUrl ? <ImageBg src={bgUrl} /> : null
+    }
+    return <VideoBg src={videoBgUrl} poster={bgUrl} />
+  }
+  if (!bgUrl) return null
+  const kind = inferMediaKind(bgUrl)
+  if (kind === 'video') {
+    return prefersReducedMotion ? null : <VideoBg src={bgUrl} />
+  }
+  return <ImageBg src={bgUrl} />
+}
+
 const BackgroundMedia = ({ bgUrl, videoBgUrl }) => {
   const prefersReducedMotion =
     typeof window !== 'undefined' &&
     window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-  const showVideo = !!videoBgUrl && !prefersReducedMotion
-
-  if (!showVideo && !bgUrl) return null
-
+  const bg = chooseBackground({ bgUrl, videoBgUrl, prefersReducedMotion })
+  if (!bg) return null
   return (
     <>
-      {showVideo ? (
-        <video
-          style={fill}
-          src={videoBgUrl}
-          poster={bgUrl || undefined}
-          autoPlay
-          loop
-          muted
-          playsInline
-        />
-      ) : bgUrl ? (
-        <img style={fill} src={bgUrl} alt="" />
-      ) : null}
+      {bg}
       <div style={overlay} />
     </>
   )

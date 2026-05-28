@@ -54,7 +54,6 @@ const Builder = () => {
   const [bgColor, setBgColor] = useState('#0b0f19')
   const [textColor, setTextColor] = useState('#f5f5f5')
   const [bgUrl, setBgUrl] = useState('')
-  const [videoBgUrl, setVideoBgUrl] = useState('')
   const [layout, setLayout] = useState('')
   const [copyState, setCopyState] = useState('idle')
 
@@ -68,10 +67,9 @@ const Builder = () => {
         bgColor,
         textColor,
         bgUrl,
-        videoBgUrl,
         layout: layout || undefined,
       }),
-    [mode, datetimeLocal, minutes, title, bgColor, textColor, bgUrl, videoBgUrl, layout],
+    [mode, datetimeLocal, minutes, title, bgColor, textColor, bgUrl, layout],
   )
 
   const fullUrl =
@@ -264,28 +262,18 @@ const Builder = () => {
 
             <CRow className="mb-3">
               <CCol>
-                <CFormLabel htmlFor="bg-url-input">Background image URL</CFormLabel>
+                <CFormLabel htmlFor="bg-url-input">Background URL</CFormLabel>
                 <CFormInput
                   id="bg-url-input"
                   type="url"
-                  placeholder="https://example.com/image.jpg"
+                  placeholder="https://example.com/image.gif or https://example.com/video.mp4"
                   value={bgUrl}
                   onChange={(e) => setBgUrl(e.target.value)}
                 />
-              </CCol>
-            </CRow>
-
-            <CRow className="mb-3">
-              <CCol>
-                <CFormLabel htmlFor="video-bg-url-input">Background video URL</CFormLabel>
-                <CFormInput
-                  id="video-bg-url-input"
-                  type="url"
-                  placeholder="https://example.com/video.mp4"
-                  value={videoBgUrl}
-                  onChange={(e) => setVideoBgUrl(e.target.value)}
-                />
-                <div className="form-text">Overrides the background image when provided.</div>
+                <div className="form-text">
+                  Any image (JPEG, PNG, GIF, APNG, WebP, AVIF, SVG — animated formats play
+                  automatically) or video (MP4, WebM, MOV, OGV) URL the browser can render natively.
+                </div>
               </CCol>
             </CRow>
 
