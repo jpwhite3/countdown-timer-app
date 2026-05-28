@@ -117,3 +117,20 @@ export function buildTimerSearch({
 
   return params.toString()
 }
+
+/**
+ * Rewrites a timer search string so the time is expressed as an absolute
+ * `timestamp` (ISO 8601, UTC). Any `minutes` parameter is removed. All other
+ * parameters are preserved verbatim. Used for share/QR URLs so a recipient
+ * sees the same end time as the original viewer, regardless of when they
+ * open the link.
+ */
+export function toAbsoluteShareSearch(search, target) {
+  if (!(target instanceof Date) || Number.isNaN(target.getTime())) {
+    return search ?? ''
+  }
+  const params = new URLSearchParams(search || '')
+  params.delete('minutes')
+  params.set('timestamp', target.toISOString())
+  return params.toString()
+}

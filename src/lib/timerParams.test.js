@@ -1,5 +1,10 @@
 import { describe, it, expect } from 'vitest'
-import { parseTimerParams, buildTimerSearch, normalizeHex } from './timerParams'
+import {
+  parseTimerParams,
+  buildTimerSearch,
+  normalizeHex,
+  toAbsoluteShareSearch,
+} from './timerParams'
 
 describe('normalizeHex', () => {
   it('accepts 3-char hex with or without #', () => {
@@ -159,5 +164,47 @@ describe('buildTimerSearch', () => {
     expect(parsed.textColor).toBe('#ffffff')
     expect(parsed.bgUrl).toBe('https://example.com/bg.png')
     expect(parsed.layout).toBe('mobile')
+  })
+})
+
+describe('toAbsoluteShareSearch', () => {
+  it('converts minutes to a fixed timestamp and drops minutes', () => {
+    const target = new Date('2026-06-01T12:15:00Z')
+    const out = toAbsoluteShareSearch('minutes=15&title=Hello', target)
+    const p = new URLSearchParams(out)
+    expect(p.get('timestamp')).toBe('2026-06-01T12:15:00.000Z')
+    expect(p.has('minutes')).toBe(false)
+    expect(p.get('title')).toBe('Hello')
+  })
+
+  it('overwrites an existing timestamp with the resolved one', () => {
+    const target = new Date('2026-06-01T12:15:00Z')
+    const out = toAbsoluteShareSearch('timestamp=2020-01-01T00:00:00Z&bg_color=000', target)
+    const p = new URLSearchParams(out)
+    expect(p.get('timestamp')).toBe('2026-06-01T12:15:00.000Z')
+    expect(p.get('bg_color')).toBe('000')
+  })
+
+  it('preserves all other params verbatim', () => {
+    const target = new Date('2026-06-01T12:15:00Z')
+    const original =
+      'minutes=5&title=Hi%20there&bg_color=000&text_color=fff&bg_url=' +
+      encodeURIComponent('https://x/y.png') +
+      '&video_bg_url=' +
+      encodeURIComponent('https://x/y.mp4') +
+      '&layout=widescreen'
+    const out = toAbsoluteShareSearch(original, target)
+    const p = new URLSearchParams(out)
+    expect(p.get('title')).toBe('Hi there')
+    expect(p.get('bg_color')).toBe('000')
+    expect(p.get('text_color')).toBe('fff')
+    expect(p.get('bg_url')).toBe('https://x/y.png')
+    expect(p.get('video_bg_url')).toBe('https://x/y.mp4')
+    expect(p.get('layout')).toBe('widescreen')
+  })
+
+  it('returns the original search when target is invalid', () => {
+    expect(toAbsoluteShareSearch('minutes=15', null)).toBe('minutes=15')
+    expect(toAbsoluteShareSearch('minutes=15', new Date('not a date'))).toBe('minutes=15')
   })
 })

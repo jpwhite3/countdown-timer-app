@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import ReactQRCode from 'react-qr-code'
-import { parseTimerParams } from '../lib/timerParams'
+import { parseTimerParams, toAbsoluteShareSearch } from '../lib/timerParams'
 import { useCountdown } from '../lib/useCountdown'
 import TimerScreen from '../components/TimerScreen'
 
@@ -41,8 +41,14 @@ const TimerView = () => {
   const [shareHref, setShareHref] = useState('')
 
   useEffect(() => {
-    setShareHref(window.location.href)
-  }, [location.search])
+    if (!params.target) {
+      setShareHref('')
+      return
+    }
+    const absSearch = toAbsoluteShareSearch(location.search.replace(/^\?/, ''), params.target)
+    const { origin, pathname } = window.location
+    setShareHref(`${origin}${pathname}#/timer${absSearch ? '?' + absSearch : ''}`)
+  }, [location.search, params.target])
 
   if (!params.target) return null
 
