@@ -43,5 +43,10 @@ export function playTone({ frequency = 880, duration = 200, volume = 0.2, type =
 }
 
 export const Cues = {
+  // Mid-pitched chime at the warning thresholds (60s, 30s, 10s).
+  chime: () => playTone({ frequency: 880, duration: 250, volume: 0.22, type: 'sine' }),
+  // Short, dry click for the per-second ticks during the last 10s.
+  tick: () => playTone({ frequency: 1320, duration: 60, volume: 0.16, type: 'square' }),
+  // Longer terminal tone the moment the countdown reaches zero.
   done: () => playTone({ frequency: 440, duration: 900, volume: 0.25, type: 'sawtooth' }),
 }
