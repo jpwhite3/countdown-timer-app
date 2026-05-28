@@ -227,6 +227,10 @@ const Builder = () => {
             <CRow className="mb-3">
               <CCol md={6} className="mb-3 mb-md-0">
                 <CFormLabel htmlFor="bg-color-input">Background color</CFormLabel>
+                <div className="form-text mb-1">
+                  Sits behind the background asset. Visible through transparent regions of the
+                  asset, or by itself when no asset is set.
+                </div>
                 <CInputGroup>
                   <CInputGroupText style={{ padding: 0 }}>
                     <input
@@ -292,6 +296,7 @@ const Builder = () => {
                 <div className="form-text">
                   Any image (JPEG, PNG, GIF, APNG, WebP, AVIF, SVG — animated formats play
                   automatically) or video (MP4, WebM, MOV, OGV) URL the browser can render natively.
+                  Transparent regions reveal the background color below.
                 </div>
               </CCol>
             </CRow>

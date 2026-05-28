@@ -1,6 +1,8 @@
 import React from 'react'
 import { inferMediaKind } from '../../lib/timerParams'
 
+// Asset fills the viewport and sits on top of the page's background color.
+// Transparent regions of the asset reveal the body's bg_color underneath.
 const fill = {
   position: 'fixed',
   inset: 0,
@@ -8,14 +10,6 @@ const fill = {
   height: '100%',
   objectFit: 'cover',
   zIndex: 0,
-  pointerEvents: 'none',
-}
-
-const overlay = {
-  position: 'fixed',
-  inset: 0,
-  background: 'rgba(0,0,0,0.35)',
-  zIndex: 1,
   pointerEvents: 'none',
 }
 
@@ -54,14 +48,7 @@ const BackgroundMedia = ({ bgUrl, videoBgUrl }) => {
     window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
-  const bg = chooseBackground({ bgUrl, videoBgUrl, prefersReducedMotion })
-  if (!bg) return null
-  return (
-    <>
-      {bg}
-      <div style={overlay} />
-    </>
-  )
+  return chooseBackground({ bgUrl, videoBgUrl, prefersReducedMotion })
 }
 
 export default BackgroundMedia
