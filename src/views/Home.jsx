@@ -10,6 +10,7 @@ import {
   CCol,
   CContainer,
   CForm,
+  CFormCheck,
   CFormInput,
   CFormLabel,
   CFormSelect,
@@ -55,6 +56,9 @@ const Builder = () => {
   const [textColor, setTextColor] = useState('#f5f5f5')
   const [bgUrl, setBgUrl] = useState('')
   const [layout, setLayout] = useState('')
+  const [flash, setFlash] = useState(false)
+  const [audio, setAudio] = useState(false)
+  const [overtime, setOvertime] = useState(false)
   const [copyState, setCopyState] = useState('idle')
 
   const search = useMemo(
@@ -68,8 +72,23 @@ const Builder = () => {
         textColor,
         bgUrl,
         layout: layout || undefined,
+        flash,
+        audio,
+        overtime,
       }),
-    [mode, datetimeLocal, minutes, title, bgColor, textColor, bgUrl, layout],
+    [
+      mode,
+      datetimeLocal,
+      minutes,
+      title,
+      bgColor,
+      textColor,
+      bgUrl,
+      layout,
+      flash,
+      audio,
+      overtime,
+    ],
   )
 
   const fullUrl =
@@ -289,6 +308,33 @@ const Builder = () => {
                   <option value="mobile">Mobile</option>
                   <option value="widescreen">Widescreen</option>
                 </CFormSelect>
+              </CCol>
+            </CRow>
+
+            <hr />
+
+            <h2 className="fs-5 mb-3">Cues</h2>
+
+            <CRow className="mb-3">
+              <CCol>
+                <CFormCheck
+                  id="enable-flash"
+                  label="Visual flash at 1:00 and 0:30; red background in the final 10 seconds"
+                  checked={flash}
+                  onChange={(e) => setFlash(e.target.checked)}
+                />
+                <CFormCheck
+                  id="enable-audio"
+                  label="Audio cues at 1:00, 0:30, every second in the final 10, and a chime at zero"
+                  checked={audio}
+                  onChange={(e) => setAudio(e.target.checked)}
+                />
+                <CFormCheck
+                  id="enable-overtime"
+                  label="Continue counting after zero (overtime, shown as a negative number)"
+                  checked={overtime}
+                  onChange={(e) => setOvertime(e.target.checked)}
+                />
               </CCol>
             </CRow>
 

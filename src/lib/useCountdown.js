@@ -1,24 +1,53 @@
 import { useEffect, useState } from 'react'
 
-function diff(targetMs, nowMs) {
-  const total = Math.max(0, targetMs - nowMs)
-  const days = Math.floor(total / 86_400_000)
-  const hours = Math.floor((total % 86_400_000) / 3_600_000)
-  const minutes = Math.floor((total % 3_600_000) / 60_000)
-  const seconds = Math.floor((total % 60_000) / 1000)
-  return { total, days, hours, minutes, seconds, completed: total === 0 }
+function diff(targetMs, nowMs, allowOvertime) {
+  const signed = targetMs - nowMs
+  if (signed <= 0 && !allowOvertime) {
+    return {
+      total: 0,
+      signedTotal: 0,
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      completed: true,
+      overtime: false,
+    }
+  }
+  const abs = Math.abs(signed)
+  return {
+    total: abs,
+    signedTotal: signed,
+    days: Math.floor(abs / 86_400_000),
+    hours: Math.floor((abs % 86_400_000) / 3_600_000),
+    minutes: Math.floor((abs % 3_600_000) / 60_000),
+    seconds: Math.floor((abs % 60_000) / 1000),
+    completed: signed <= 0,
+    overtime: allowOvertime && signed <= 0,
+  }
 }
 
 /**
  * Returns the countdown breakdown to `target`, updating once per second.
- * Stops the interval when complete.
+ * If `allowOvertime` is true, the countdown keeps running past zero with
+ * `overtime: true` and `signedTotal < 0`; otherwise it clamps at zero and
+ * the interval is cleared.
  */
-export function useCountdown(target) {
+export function useCountdown(target, { allowOvertime = false } = {}) {
   const targetMs = target instanceof Date ? target.getTime() : null
   const [state, setState] = useState(() =>
     targetMs == null
-      ? { total: 0, days: 0, hours: 0, minutes: 0, seconds: 0, completed: false }
-      : diff(targetMs, Date.now()),
+      ? {
+          total: 0,
+          signedTotal: 0,
+          days: 0,
+          hours: 0,
+          minutes: 0,
+          seconds: 0,
+          completed: false,
+          overtime: false,
+        }
+      : diff(targetMs, Date.now(), allowOvertime),
   )
 
   useEffect(() => {
@@ -26,9 +55,9 @@ export function useCountdown(target) {
     let cancelled = false
     const tick = () => {
       if (cancelled) return
-      const next = diff(targetMs, Date.now())
+      const next = diff(targetMs, Date.now(), allowOvertime)
       setState(next)
-      if (next.completed) clearInterval(id)
+      if (next.completed && !allowOvertime) clearInterval(id)
     }
     tick()
     const id = setInterval(tick, 1000)
@@ -36,7 +65,7 @@ export function useCountdown(target) {
       cancelled = true
       clearInterval(id)
     }
-  }, [targetMs])
+  }, [targetMs, allowOvertime])
 
   return state
 }

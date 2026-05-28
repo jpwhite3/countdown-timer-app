@@ -105,6 +105,24 @@ function parseLayout(value) {
   return VALID_LAYOUTS.has(v) ? v : null
 }
 
+const TRUTHY_BOOL = new Set(['', '1', 'true', 'yes', 'on'])
+const FALSY_BOOL = new Set(['0', 'false', 'no', 'off'])
+
+/**
+ * Parse a URL bool param leniently. Accepts bare flags (`?enable_flash`,
+ * value === ''), explicit truthy ('1', 'true', 'yes', 'on') and falsy
+ * ('0', 'false', 'no', 'off') values. Anything else (including `null`,
+ * meaning the key wasn't present) is `false`.
+ */
+export function parseBoolParam(value) {
+  if (value == null) return false
+  if (typeof value !== 'string') return false
+  const v = value.trim().toLowerCase()
+  if (TRUTHY_BOOL.has(v)) return true
+  if (FALSY_BOOL.has(v)) return false
+  return false
+}
+
 /**
  * Parse a URL search string (without the leading `?`) into the timer view's
  * resolved props. Anything missing or invalid falls back to a default; the
@@ -125,6 +143,9 @@ export function parseTimerParams(search, { now = Date.now() } = {}) {
     bgUrl: safeUrl(params.get('bg_url')),
     videoBgUrl: safeUrl(params.get('video_bg_url')),
     layout: parseLayout(params.get('layout')),
+    flash: parseBoolParam(params.get('enable_flash')),
+    audio: parseBoolParam(params.get('enable_audio')),
+    overtime: parseBoolParam(params.get('enable_overtime')),
     error: target ? null : 'missing-time',
   }
 }
@@ -144,6 +165,9 @@ export function buildTimerSearch({
   bgUrl,
   videoBgUrl,
   layout,
+  flash,
+  audio,
+  overtime,
 } = {}) {
   const params = new URLSearchParams()
 
@@ -167,6 +191,10 @@ export function buildTimerSearch({
   if (videoBgUrl && videoBgUrl.trim()) params.set('video_bg_url', videoBgUrl.trim())
 
   if (layout && VALID_LAYOUTS.has(layout)) params.set('layout', layout)
+
+  if (flash) params.set('enable_flash', '1')
+  if (audio) params.set('enable_audio', '1')
+  if (overtime) params.set('enable_overtime', '1')
 
   return params.toString()
 }

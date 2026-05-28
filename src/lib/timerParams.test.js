@@ -5,6 +5,7 @@ import {
   normalizeHex,
   toAbsoluteShareSearch,
   inferMediaKind,
+  parseBoolParam,
 } from './timerParams'
 
 describe('normalizeHex', () => {
@@ -254,5 +255,72 @@ describe('inferMediaKind', () => {
     expect(inferMediaKind('   ')).toBeNull()
     expect(inferMediaKind(null)).toBeNull()
     expect(inferMediaKind(undefined)).toBeNull()
+  })
+})
+
+describe('parseBoolParam', () => {
+  it('treats a bare flag (empty-string value) as true', () => {
+    expect(parseBoolParam('')).toBe(true)
+  })
+
+  it('accepts common truthy strings', () => {
+    for (const v of ['1', 'true', 'TRUE', 'Yes', 'on']) {
+      expect(parseBoolParam(v)).toBe(true)
+    }
+  })
+
+  it('accepts common falsy strings', () => {
+    for (const v of ['0', 'false', 'no', 'OFF']) {
+      expect(parseBoolParam(v)).toBe(false)
+    }
+  })
+
+  it('returns false for missing key (null) and unknown values', () => {
+    expect(parseBoolParam(null)).toBe(false)
+    expect(parseBoolParam(undefined)).toBe(false)
+    expect(parseBoolParam('huh')).toBe(false)
+  })
+})
+
+describe('bool params in parseTimerParams + buildTimerSearch', () => {
+  const NOW = Date.parse('2026-06-01T12:00:00Z')
+
+  it('parses bare flags (no =) and explicit truthy/falsy values', () => {
+    const a = parseTimerParams('minutes=1&enable_flash&enable_audio=true&enable_overtime=0', {
+      now: NOW,
+    })
+    expect(a.flash).toBe(true)
+    expect(a.audio).toBe(true)
+    expect(a.overtime).toBe(false)
+  })
+
+  it('defaults to false when absent', () => {
+    const a = parseTimerParams('minutes=1', { now: NOW })
+    expect(a.flash).toBe(false)
+    expect(a.audio).toBe(false)
+    expect(a.overtime).toBe(false)
+  })
+
+  it('round-trips through builder + parser', () => {
+    const s = buildTimerSearch({
+      mode: 'minutes',
+      minutes: '5',
+      flash: true,
+      audio: true,
+      overtime: true,
+    })
+    const p = new URLSearchParams(s)
+    expect(p.get('enable_flash')).toBe('1')
+    expect(p.get('enable_audio')).toBe('1')
+    expect(p.get('enable_overtime')).toBe('1')
+    const parsed = parseTimerParams(s, { now: NOW })
+    expect(parsed.flash).toBe(true)
+    expect(parsed.audio).toBe(true)
+    expect(parsed.overtime).toBe(true)
+  })
+
+  it('omits flags when false', () => {
+    const s = buildTimerSearch({ mode: 'minutes', minutes: '5', flash: false })
+    expect(new URLSearchParams(s).has('enable_flash')).toBe(false)
   })
 })

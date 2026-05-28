@@ -1,5 +1,5 @@
 import React from 'react'
-import { visibleSegments } from './segments'
+import { formatSegments } from './segments'
 
 const container = {
   position: 'relative',
@@ -77,11 +77,12 @@ const qrCorner = {
 }
 
 const WidescreenLayout = ({ title, countdown, qrSlot }) => {
-  const segments = visibleSegments(countdown)
+  const segments = formatSegments(countdown)
+  const showCompleted = countdown.completed && !countdown.overtime
   return (
     <div style={container}>
       {title ? <h1 style={titleStyle}>{title}</h1> : null}
-      {countdown.completed ? (
+      {showCompleted ? (
         <div style={completed} aria-live="polite">
           Time is up!
         </div>

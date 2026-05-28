@@ -21,3 +21,15 @@ export function visibleSegments({ days, hours, minutes, seconds }) {
     })
     .map((s) => ({ ...s, display: String(s.value).padStart(2, '0') }))
 }
+
+/**
+ * Format a countdown breakdown for display. When `overtime` is true and the
+ * countdown is past zero, prefixes the first segment with a leading `-`.
+ */
+export function formatSegments(countdown) {
+  const segs = visibleSegments(countdown)
+  if (countdown.overtime && segs.length) {
+    segs[0] = { ...segs[0], display: '-' + segs[0].display }
+  }
+  return segs
+}
