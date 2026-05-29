@@ -2,11 +2,12 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches:
+      - '**'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
 
@@ -40,13 +41,49 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Get branch slug
+        id: get-slug
+        run: |
+          SLUG=$(echo "${{ github.ref_name }}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g' | sed -E 's/^-+|-+$//g')
+          echo "slug=$SLUG" >> $GITHUB_OUTPUT
+
+      - name: Deploy to gh-pages branch
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: dist
+          target-folder: ${{ steps.get-slug.outputs.slug }}
+
+      - name: Checkout gh-pages branch
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages-site
+
+      - name: Ensure root redirect index.html
+        run: |
+          if [ ! -f ./gh-pages-site/index.html ]; then
+            cat << 'EOF' > ./gh-pages-site/index.html
+          <!DOCTYPE html>
+          <html>
+          <head>
+            <meta http-equiv="refresh" content="0; url=./main/">
+            <title>Redirecting to main branch</title>
+          </head>
+          <body>
+            <p>Redirecting to <a href="./main/">main branch</a>...</p>
+          </body>
+          </html>
+          EOF
+          fi
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: ./gh-pages-site
 
   deploy:
     needs: build
