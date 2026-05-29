@@ -1,0 +1,1 @@
+import{i as e,t}from"./index-BwVeBR97.js";e();var n=t(),r=()=>(0,n.jsxs)(`div`,{className:`m-4 text-center`,children:[(0,n.jsx)(`h1`,{className:`display-3`,children:`404`}),(0,n.jsx)(`p`,{className:`fs-4`,children:`Oops! The page you are looking for cannot be found.`})]});export{r as default};
