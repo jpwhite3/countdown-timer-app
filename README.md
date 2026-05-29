@@ -13,6 +13,7 @@ This is a simple webapp built with React and CoreUI. It allows you to set a date
 - [Quick Start](#quick-start)
 - [Installation](#installation)
 - [Basic usage](#basic-usage)
+- [Contributing & AI Agent Workflows](#contributing--ai-agent-workflows)
 - [Copyright and License](#copyright-and-license)
 
 ## Quick Start
@@ -58,6 +59,12 @@ $ npm run preview
 # run unit tests (Vitest)
 $ npm test
 ```
+
+## Contributing & AI Agent Workflows
+
+Contributions are welcome! This repository uses **Spec Kit (speckit)** to manage feature development systematically with AI agents. 
+
+Please read [CONTRIBUTION.md](file:///Users/jpwhite/Code/countdown-timer-app/CONTRIBUTION.md) for full instructions on configuring your AI agent, working with the project constitution, and following our development lifecycle.
 
 ## Copyright and License
 
