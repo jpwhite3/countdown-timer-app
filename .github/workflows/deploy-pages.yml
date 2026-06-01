@@ -19,6 +19,7 @@ concurrency:
 
 jobs:
   build:
+    if: github.ref_name != 'gh-pages'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -54,16 +55,20 @@ jobs:
           folder: dist
           target-folder: ${{ steps.get-slug.outputs.slug }}
 
-      - name: Checkout gh-pages branch
+  deploy:
+    if: github.ref_name == 'gh-pages'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          ref: gh-pages
-          path: gh-pages-site
 
       - name: Ensure root redirect index.html
         run: |
-          if [ ! -f ./gh-pages-site/index.html ]; then
-            cat << 'EOF' > ./gh-pages-site/index.html
+          if [ ! -f index.html ]; then
+            cat << 'EOF' > index.html
           <!DOCTYPE html>
           <html>
           <head>
@@ -83,15 +88,8 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./gh-pages-site
+          path: .
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
