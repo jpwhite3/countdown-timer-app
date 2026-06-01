@@ -5,11 +5,18 @@ on:
     branches:
       - '**'
   workflow_dispatch:
+    inputs:
+      deploy_only:
+        description: 'Only run the deploy job'
+        required: false
+        default: 'false'
+        type: string
 
 permissions:
   contents: write
   pages: write
   id-token: write
+  actions: write
 
 # Allow only one concurrent deployment, skipping runs queued between an
 # in-progress run and the latest queued run.
@@ -19,7 +26,7 @@ concurrency:
 
 jobs:
   build:
-    if: github.ref_name != 'gh-pages'
+    if: github.ref_name != 'gh-pages' && github.event.inputs.deploy_only != 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -55,8 +62,21 @@ jobs:
           folder: dist
           target-folder: ${{ steps.get-slug.outputs.slug }}
 
+      - name: Trigger deployment on main
+        if: github.ref_name != 'main'
+        run: |
+          gh workflow run deploy-pages.yml --ref main -f deploy_only=true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   deploy:
-    if: github.ref_name == 'gh-pages'
+    needs: build
+    if: |
+      always() &&
+      !failure() &&
+      !cancelled() &&
+      github.ref_name == 'main' &&
+      (github.event_name == 'push' || github.event.inputs.deploy_only == 'true')
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -64,6 +84,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: gh-pages
 
       - name: Ensure root redirect index.html
         run: |
