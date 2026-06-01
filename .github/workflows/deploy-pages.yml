@@ -5,12 +5,6 @@ on:
     branches:
       - '**'
   workflow_dispatch:
-    inputs:
-      deploy_only:
-        description: 'Only run the deploy job'
-        required: false
-        default: 'false'
-        type: string
 
 permissions:
   contents: write
@@ -26,7 +20,7 @@ concurrency:
 
 jobs:
   build:
-    if: github.ref_name != 'gh-pages' && github.event.inputs.deploy_only != 'true'
+    if: github.ref_name != 'gh-pages' && github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -65,7 +59,7 @@ jobs:
       - name: Trigger deployment on main
         if: github.ref_name != 'main'
         run: |
-          gh workflow run deploy-pages.yml --ref main -f deploy_only=true
+          gh workflow run deploy-pages.yml --ref main
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -76,7 +70,7 @@ jobs:
       !failure() &&
       !cancelled() &&
       github.ref_name == 'main' &&
-      (github.event_name == 'push' || github.event.inputs.deploy_only == 'true')
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     environment:
       name: github-pages
