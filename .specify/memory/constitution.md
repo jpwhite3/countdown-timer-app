@@ -39,7 +39,7 @@ The application MUST play audio/visual cues (e.g. voice countdowns, alarm sounde
 All business and helper logic (e.g., parser utils in `timerParams.js`, countdown hooks) MUST have corresponding unit/integration tests written with Vitest and testing-library. The project MUST maintain a minimum test coverage threshold (e.g., 90% coverage on `src/lib/` logic) to prevent regression. All UI-facing actions MUST be verifiable using automated React testing library or Playwright test suites.
 
 ## Technology Stack Constraints
-All application code MUST be implemented using React 18, CoreUI 5, Redux, and React Router. Styles MUST be managed using Sass/SCSS to customize CoreUI variables. The app MUST target modern browsers via ES2020 compatibility settings and compile using Vite. Local state management MUST follow Redux guidelines for consistent state projection.
+All application code MUST be implemented using React 18, Material UI, Redux, and React Router. Styles MUST be managed using custom Vanilla CSS and Material UI theme overrides. The app MUST target modern browsers via ES2020 compatibility settings and compile using Vite. Local state management MUST follow Redux guidelines for consistent state projection.
 
 ## Development Workflow & Quality Gates
 - **Linting & Formatting**: All JS/JSX code MUST pass ESLint rules and Prettier formatting checks prior to commit.

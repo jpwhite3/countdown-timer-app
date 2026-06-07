@@ -1,0 +1,126 @@
+:root {
+  /* HSL Color Palette - Light Theme defaults */
+  --primary-h: 215;
+  --primary-s: 52%;
+  --primary-l: 24%;
+  --primary: HSL(var(--primary-h), var(--primary-s), var(--primary-l));
+
+  --background-h: 210;
+  --background-s: 40%;
+  --background-l: 98%;
+  --background: HSL(var(--background-h), var(--background-s), var(--background-l));
+
+  --surface-h: 0;
+  --surface-s: 0%;
+  --surface-l: 100%;
+  --surface: HSLA(var(--surface-h), var(--surface-s), var(--surface-l), 0.7);
+
+  --text-h: 215;
+  --text-s: 25%;
+  --text-l: 10%;
+  --text: HSL(var(--text-h), var(--text-s), var(--text-l));
+
+  --text-secondary-h: 215;
+  --text-secondary-s: 16%;
+  --text-secondary-l: 47%;
+  --text-secondary: HSL(var(--text-secondary-h), var(--text-secondary-s), var(--text-secondary-l));
+
+  --border-h: 215;
+  --border-s: 16%;
+  --border-l: 90%;
+  --border: HSLA(var(--border-h), var(--border-s), var(--border-l), 0.5);
+
+  --glass-bg: HSLA(210, 40%, 98%, 0.7);
+  --glass-border: HSLA(215, 16%, 90%, 0.5);
+  --glass-shadow: 0 8px 32px 0 RGBA(31, 38, 135, 0.08);
+  --glass-blur: blur(12px);
+  --glass-webkit-blur: blur(12px);
+
+  --transition-speed: 200ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* HSL Color Palette - Dark Theme overrides */
+    --primary-h: 215;
+    --primary-s: 60%;
+    --primary-l: 60%;
+
+    --background-h: 222;
+    --background-s: 47%;
+    --background-l: 11%;
+
+    --surface-h: 222;
+    --surface-s: 47%;
+    --surface-l: 15%;
+    --surface: HSLA(var(--surface-h), var(--surface-s), var(--surface-l), 0.6);
+
+    --text-h: 210;
+    --text-s: 40%;
+    --text-l: 98%;
+
+    --text-secondary-h: 215;
+    --text-secondary-s: 16%;
+    --text-secondary-l: 70%;
+
+    --border-h: 217;
+    --border-s: 19%;
+    --border-l: 27%;
+    --border: HSLA(var(--border-h), var(--border-s), var(--border-l), 0.4);
+
+    --glass-bg: HSLA(222, 47%, 15%, 0.6);
+    --glass-border: HSLA(217, 19%, 27%, 0.4);
+    --glass-shadow: 0 8px 32px 0 RGBA(0, 0, 0, 0.37);
+  }
+}
+
+/* Glassmorphism utility classes */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-webkit-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  border-radius: 12px;
+  transition: background-color var(--transition-speed) ease, border-color var(--transition-speed) ease;
+}
+
+.glass-card {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-webkit-blur) !important;
+  border: 1px solid var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  border-radius: 16px !important;
+  transition: transform var(--transition-speed) ease, box-shadow var(--transition-speed) ease, background-color var(--transition-speed) ease !important;
+}
+
+.glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px 0 RGBA(31, 38, 135, 0.12) !important;
+}
+
+/* Custom interactive animations */
+.interactive-element {
+  transition: transform 150ms cubic-bezier(0.4, 0, 0.2, 1), background-color var(--transition-speed) ease;
+}
+
+.interactive-element:active {
+  transform: scale(0.97);
+}
+
+/* Custom scrollbars for modern aesthetics */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}

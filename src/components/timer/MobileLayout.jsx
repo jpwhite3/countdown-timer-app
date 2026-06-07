@@ -13,7 +13,7 @@ const container = {
   textAlign: 'center',
 }
 
-const fontFamily = 'Inter, Roboto, system-ui, sans-serif'
+const fontFamily = '"Outfit", "Inter", "Roboto", system-ui, sans-serif'
 
 const titleStyle = {
   fontFamily,
