@@ -8,7 +8,7 @@ export const createCustomTheme = (mode) =>
       secondary: { main: '#64748b' },
       background: {
         default: mode === 'dark' ? '#0b0f19' : '#f8fafc',
-        paper: mode === 'dark' ? 'rgba(15, 23, 42, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+        paper: mode === 'dark' ? '#1e293b' : '#ffffff',
       },
       text: {
         primary: mode === 'dark' ? '#f8fafc' : '#0f172a',
