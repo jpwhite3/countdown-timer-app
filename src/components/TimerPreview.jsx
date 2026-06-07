@@ -78,12 +78,12 @@ const TimerPreview = ({ title, countdown, bgColor, textColor, bgUrl, layout, dim
         aspectRatio: `${vp.w} / ${vp.h}`,
         margin: '0 auto',
         overflow: 'hidden',
-        borderRadius: theme.shape.borderRadius,
-        border: `1px solid ${theme.palette.divider}`,
+        borderRadius: '16px',
+        border: '1px solid var(--glass-border)',
         backgroundColor: bgColor,
         color: textColor,
-        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.08)',
-        transition: 'background-color 200ms ease, color 200ms ease',
+        boxShadow: 'var(--glass-shadow)',
+        transition: 'background-color 200ms ease, color 200ms ease, border-color var(--transition-speed) ease',
       }}
     >
       <div
