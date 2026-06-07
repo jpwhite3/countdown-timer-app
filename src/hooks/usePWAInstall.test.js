@@ -25,17 +25,11 @@ describe('usePWAInstall hook', () => {
   it('registers listener on mount and unregisters on unmount', () => {
     const { unmount } = renderHook(() => usePWAInstall())
 
-    expect(addEventListenerSpy).toHaveBeenCalledWith(
-      'beforeinstallprompt',
-      expect.any(Function)
-    )
+    expect(addEventListenerSpy).toHaveBeenCalledWith('beforeinstallprompt', expect.any(Function))
 
     unmount()
 
-    expect(removeEventListenerSpy).toHaveBeenCalledWith(
-      'beforeinstallprompt',
-      expect.any(Function)
-    )
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('beforeinstallprompt', expect.any(Function))
   })
 
   it('initially returns isInstallable as false', () => {
@@ -47,7 +41,7 @@ describe('usePWAInstall hook', () => {
     const { result } = renderHook(() => usePWAInstall())
 
     const callback = addEventListenerSpy.mock.calls.find(
-      (call) => call[0] === 'beforeinstallprompt'
+      (call) => call[0] === 'beforeinstallprompt',
     )[1]
 
     act(() => {
@@ -62,7 +56,7 @@ describe('usePWAInstall hook', () => {
     const { result } = renderHook(() => usePWAInstall())
 
     const callback = addEventListenerSpy.mock.calls.find(
-      (call) => call[0] === 'beforeinstallprompt'
+      (call) => call[0] === 'beforeinstallprompt',
     )[1]
 
     act(() => {

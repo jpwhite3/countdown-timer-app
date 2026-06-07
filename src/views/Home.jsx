@@ -9,7 +9,6 @@ import CardContent from '@mui/material/CardContent'
 import Checkbox from '@mui/material/Checkbox'
 import FormControl from '@mui/material/FormControl'
 import FormControlLabel from '@mui/material/FormControlLabel'
-import FormHelperText from '@mui/material/FormHelperText'
 import Grid from '@mui/material/Grid'
 import InputAdornment from '@mui/material/InputAdornment'
 import MenuItem from '@mui/material/MenuItem'
@@ -222,7 +221,9 @@ const Builder = () => {
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <ScheduleIcon color="primary" sx={{ mr: 1.5 }} />
-                  <Typography variant="h6" sx={{ fontWeight: 700 }}>Duration</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    Duration
+                  </Typography>
                 </Box>
                 <Tabs
                   value={mode}
@@ -283,8 +284,12 @@ const Builder = () => {
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
                   <PaletteOutlinedIcon color="primary" sx={{ mr: 1.5 }} />
-                  <Typography variant="h6" sx={{ fontWeight: 700 }}>Appearance</Typography>
-                  <Typography variant="caption" sx={{ ml: 1.5, color: 'text.secondary' }}>Optional</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    Appearance
+                  </Typography>
+                  <Typography variant="caption" sx={{ ml: 1.5, color: 'text.secondary' }}>
+                    Optional
+                  </Typography>
                 </Box>
                 <Stack spacing={3}>
                   <TextField
@@ -378,7 +383,9 @@ const Builder = () => {
               <CardContent>
                 <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                   <VolumeUpOutlinedIcon color="primary" sx={{ mr: 1.5 }} />
-                  <Typography variant="h6" sx={{ fontWeight: 700 }}>Cues</Typography>
+                  <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                    Cues
+                  </Typography>
                 </Box>
                 <Stack spacing={1}>
                   <FormControlLabel
@@ -424,8 +431,18 @@ const Builder = () => {
               {/* Preview Card */}
               <Card className="glass-card">
                 <CardContent sx={{ pb: 1 }}>
-                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Live Preview</Typography>
-                  <Paper variant="outlined" sx={{ overflow: 'hidden', borderRadius: '12px', bgcolor: 'transparent', border: 'none' }}>
+                  <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>
+                    Live Preview
+                  </Typography>
+                  <Paper
+                    variant="outlined"
+                    sx={{
+                      overflow: 'hidden',
+                      borderRadius: '12px',
+                      bgcolor: 'transparent',
+                      border: 'none',
+                    }}
+                  >
                     <TimerPreview
                       title={title}
                       countdown={previewCountdown}
@@ -436,7 +453,11 @@ const Builder = () => {
                       dim={previewDim}
                     />
                   </Paper>
-                  <Typography variant="caption" display="block" sx={{ textAlign: 'center', mt: 1.5, color: 'text.secondary' }}>
+                  <Typography
+                    variant="caption"
+                    display="block"
+                    sx={{ textAlign: 'center', mt: 1.5, color: 'text.secondary' }}
+                  >
                     Audio alarms and the QR code are active only when running.
                   </Typography>
                 </CardContent>
@@ -447,7 +468,9 @@ const Builder = () => {
                 <CardContent>
                   <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
                     <ShareOutlinedIcon color="primary" sx={{ mr: 1.5 }} />
-                    <Typography variant="h6" sx={{ fontWeight: 700 }}>Share & Start</Typography>
+                    <Typography variant="h6" sx={{ fontWeight: 700 }}>
+                      Share & Start
+                    </Typography>
                   </Box>
                   <TextField
                     id="share-url"
@@ -473,18 +496,18 @@ const Builder = () => {
                   />
                 </CardContent>
                 <CardActions sx={{ px: 2, pb: 3, pt: 0 }}>
-                  <Button 
-                    variant="contained" 
-                    size="large" 
-                    fullWidth 
-                    onClick={start} 
+                  <Button
+                    variant="contained"
+                    size="large"
+                    fullWidth
+                    onClick={start}
                     disabled={!canStart}
                     className="interactive-element"
-                    sx={{ 
+                    sx={{
                       borderRadius: '12px',
                       py: 1.5,
                       fontWeight: 700,
-                      boxShadow: '0 4px 14px 0 rgba(30, 58, 95, 0.2)'
+                      boxShadow: '0 4px 14px 0 rgba(30, 58, 95, 0.2)',
                     }}
                   >
                     Start Timer

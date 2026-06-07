@@ -20,13 +20,13 @@ export const usePWAInstall = () => {
 
   const install = async () => {
     if (!deferredPrompt) return false
-    
+
     deferredPrompt.prompt()
     const { outcome } = await deferredPrompt.userChoice
-    
+
     // Clear deferred prompt since it can only be prompted once
     setDeferredPrompt(null)
-    
+
     return outcome === 'accepted'
   }
 

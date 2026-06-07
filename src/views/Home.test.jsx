@@ -13,7 +13,7 @@ describe('Builder Component', () => {
         <HashRouter>
           <Builder />
         </HashRouter>
-      </Provider>
+      </Provider>,
     )
 
     const bgPicker = screen.getByLabelText(/background color picker/i)

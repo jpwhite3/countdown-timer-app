@@ -10,20 +10,20 @@ import InstallMobileIcon from '@mui/icons-material/InstallMobile'
 
 const AppShell = ({ children, maxWidth = 'md', isInstallable = false, onInstall = () => {} }) => {
   return (
-    <Box 
-      sx={{ 
-        display: 'flex', 
-        flexDirection: 'column', 
-        minHeight: '100vh', 
-        bgcolor: 'background.default', 
-        transition: 'background-color 200ms ease' 
+    <Box
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        minHeight: '100vh',
+        bgcolor: 'background.default',
+        transition: 'background-color 200ms ease',
       }}
     >
-      <AppBar 
-        position="sticky" 
-        sx={{ 
-          background: 'var(--glass-bg)', 
-          backdropFilter: 'var(--glass-blur)', 
+      <AppBar
+        position="sticky"
+        sx={{
+          background: 'var(--glass-bg)',
+          backdropFilter: 'var(--glass-blur)',
           WebkitBackdropFilter: 'var(--glass-blur)',
           borderBottom: '1px solid var(--glass-border)',
           boxShadow: 'var(--glass-shadow)',
@@ -52,7 +52,7 @@ const AppShell = ({ children, maxWidth = 'md', isInstallable = false, onInstall 
                 '&:hover': {
                   background: 'var(--glass-border)',
                   borderColor: 'var(--glass-border)',
-                }
+                },
               }}
             >
               Install App

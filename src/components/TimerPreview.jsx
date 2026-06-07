@@ -1,5 +1,4 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import { useTheme } from '@mui/material/styles'
 import TimerScreen from './TimerScreen'
 
 const FRAME_MAX_WIDTH = 720
@@ -42,7 +41,6 @@ function useViewportSize() {
  * concerns. The preview shows the steady visual state.
  */
 const TimerPreview = ({ title, countdown, bgColor, textColor, bgUrl, layout, dim }) => {
-  const theme = useTheme()
   const frameRef = useRef(null)
   const [frameWidth, setFrameWidth] = useState(0)
   const vp = useViewportSize()
@@ -83,7 +81,8 @@ const TimerPreview = ({ title, countdown, bgColor, textColor, bgUrl, layout, dim
         backgroundColor: bgColor,
         color: textColor,
         boxShadow: 'var(--glass-shadow)',
-        transition: 'background-color 200ms ease, color 200ms ease, border-color var(--transition-speed) ease',
+        transition:
+          'background-color 200ms ease, color 200ms ease, border-color var(--transition-speed) ease',
       }}
     >
       <div
