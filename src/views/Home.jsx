@@ -34,25 +34,20 @@ import { buildTimerSearch, DEFAULT_DIM, effectiveDim } from '../lib/timerParams'
 import { unlockAudio } from '../lib/audioCues'
 import { useCountdown } from '../lib/useCountdown'
 import TimerPreview from '../components/TimerPreview'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker'
+import dayjs from 'dayjs'
 
 const QUICK_MINUTES = [5, 10, 15, 30, 60]
 
-function pad(n) {
-  return String(n).padStart(2, '0')
-}
-
 function defaultDatetimeLocal() {
-  const d = new Date(Date.now() + 15 * 60_000)
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
-    d.getHours(),
-  )}:${pad(d.getMinutes())}`
+  return dayjs().add(15, 'minute')
 }
 
 function datetimeLocalToIso(dl) {
-  if (!dl) return ''
-  const d = new Date(dl)
-  if (Number.isNaN(d.getTime())) return ''
-  return d.toISOString()
+  if (!dl || !dayjs.isDayjs(dl) || !dl.isValid()) return ''
+  return dl.toISOString()
 }
 
 function ColorPickerField({ id, label, value, onChange, helperText }) {
@@ -271,16 +266,21 @@ const Builder = () => {
                 </ToggleButtonGroup>
               </Stack>
             ) : (
-              <TextField
-                id="datetime-input"
-                label="Date and time"
-                type="datetime-local"
-                fullWidth
-                value={datetimeLocal}
-                onChange={(e) => setDatetimeLocal(e.target.value)}
-                helperText="Uses your local timezone. The timer URL will encode it as an ISO timestamp."
-                slotProps={{ inputLabel: { shrink: true } }}
-              />
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DateTimePicker
+                  label="Date and time"
+                  value={datetimeLocal}
+                  onChange={(newValue) => setDatetimeLocal(newValue)}
+                  slotProps={{
+                    textField: {
+                      id: 'datetime-input',
+                      fullWidth: true,
+                      helperText:
+                        'Uses your local timezone. The timer URL will encode it as an ISO timestamp.',
+                    },
+                  }}
+                />
+              </LocalizationProvider>
             )}
           </CardContent>
         </Card>
