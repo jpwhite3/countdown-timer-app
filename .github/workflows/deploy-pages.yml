@@ -54,7 +54,8 @@ jobs:
         with:
           branch: gh-pages
           folder: dist
-          target-folder: ${{ steps.get-slug.outputs.slug }}
+          target-folder: ${{ github.ref_name == 'main' && '' || steps.get-slug.outputs.slug }}
+          clean: ${{ github.ref_name != 'main' }}
 
       - name: Trigger deployment on main
         if: github.ref_name != 'main'
@@ -83,7 +84,7 @@ jobs:
 
       - name: Generate branch index page
         run: |
-          cat << 'EOF' > index.html
+          cat << 'EOF' > branches.html
           <!DOCTYPE html>
           <html lang="en">
           <head>
@@ -191,26 +192,33 @@ jobs:
               <h1>Countdown Timer</h1>
               <p class="subtitle">Select a deployed branch preview below</p>
               <div class="branch-list">
+                <a href="./" class="branch-card">
+                  <span class="branch-name">Production (main)</span>
+                  <span style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span class="branch-tag main">main</span>
+                    <span class="arrow">&rarr;</span>
+                  </span>
+                </a>
           EOF
 
           # Loop through and append branch cards
           for dir in *; do
-            if [ -d "$dir" ] && [ -f "$dir/index.html" ]; then
+            if [ -d "$dir" ] && [ "$dir" != "assets" ] && [ "$dir" != "icons" ] && [ -f "$dir/index.html" ]; then
               tag_class="branch-tag"
-              if [ "$dir" = "main" ]; then
+              if [ "$dir" = "develop" ]; then
                 tag_class="branch-tag main"
               fi
-              echo "      <a href=\"./$dir/\" class=\"branch-card\">" >> index.html
-              echo "        <span class=\"branch-name\">$dir</span>" >> index.html
-              echo "        <span style=\"display: flex; align-items: center; gap: 0.75rem;\">" >> index.html
-              echo "          <span class=\"$tag_class\">$dir</span>" >> index.html
-              echo "          <span class=\"arrow\">&rarr;</span>" >> index.html
-              echo "        </span>" >> index.html
-              echo "      </a>" >> index.html
+              echo "      <a href=\"./$dir/\" class=\"branch-card\">" >> branches.html
+              echo "        <span class=\"branch-name\">$dir</span>" >> branches.html
+              echo "        <span style=\"display: flex; align-items: center; gap: 0.75rem;\">" >> branches.html
+              echo "          <span class=\"$tag_class\">$dir</span>" >> branches.html
+              echo "          <span class=\"arrow\">&rarr;</span>" >> branches.html
+              echo "        </span>" >> branches.html
+              echo "      </a>" >> branches.html
             fi
           done
 
-          cat << 'EOF' >> index.html
+          cat << 'EOF' >> branches.html
               </div>
             </div>
           </body>
