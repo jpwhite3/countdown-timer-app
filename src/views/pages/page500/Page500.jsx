@@ -1,12 +1,23 @@
 import React from 'react'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Typography from '@mui/material/Typography'
+import AppShell from '../../../components/AppShell'
 
-const Page500 = () => {
-  return (
-    <div className="m-4 text-center">
-      <h1 className="display-3">500</h1>
-      <p className="fs-4">Something went wrong on our end. Please try again later.</p>
-    </div>
-  )
-}
+const Page500 = () => (
+  <AppShell>
+    <Box sx={{ textAlign: 'center', py: 6 }}>
+      <Typography variant="h2" component="h1" gutterBottom>
+        500
+      </Typography>
+      <Typography variant="h6" color="text.secondary" paragraph>
+        Something went wrong on our end. Please try again later.
+      </Typography>
+      <Button variant="contained" href="#/">
+        Back to home
+      </Button>
+    </Box>
+  </AppShell>
+)
 
 export default Page500

@@ -1,11 +1,12 @@
 import React, { Suspense } from 'react'
+import Box from '@mui/material/Box'
+import CircularProgress from '@mui/material/CircularProgress'
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
-import './scss/style.scss'
 
 const loading = (
-  <div className="pt-3 text-center">
-    <div className="sk-spinner sk-spinner-pulse"></div>
-  </div>
+  <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', pt: 6 }}>
+    <CircularProgress />
+  </Box>
 )
 
 const Builder = React.lazy(() => import('./views/Home'))

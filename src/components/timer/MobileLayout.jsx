@@ -13,7 +13,10 @@ const container = {
   textAlign: 'center',
 }
 
+const fontFamily = 'Inter, Roboto, system-ui, sans-serif'
+
 const titleStyle = {
+  fontFamily,
   fontSize: 'clamp(1.5rem, 6vw, 2.5rem)',
   fontWeight: 600,
   marginBottom: '1.5rem',
@@ -38,6 +41,7 @@ const segment = {
 }
 
 const digit = {
+  fontFamily,
   fontSize: 'clamp(3.5rem, 14vw, 5rem)',
   fontWeight: 700,
   fontVariantNumeric: 'tabular-nums',
