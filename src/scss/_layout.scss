@@ -1,6 +1,8 @@
+@use "@coreui/coreui/scss/coreui" as *;
+
 .wrapper {
   width: 100%;
-  @include ltr-rtl("padding-left", var(--cui-sidebar-occupy-start, 0));
+  padding-inline: var(--cui-sidebar-occupy-start, 0) var(--cui-sidebar-occupy-end, 0);
   will-change: auto;
   @include transition(padding .15s);
 }

@@ -1,5 +1,10 @@
 // Variables
 //
+// To override CoreUI variables, add them to the `with` block in style.scss:
+// @use "@coreui/coreui/scss/coreui" as * with (
+//   $primary: #321fdb,
+// );
+//
 // If you want to customize your project please uncomment and update one of the following variables.
 
 // Color system
