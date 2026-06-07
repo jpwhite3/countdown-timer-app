@@ -22,6 +22,9 @@ import TextField from '@mui/material/TextField'
 import ToggleButton from '@mui/material/ToggleButton'
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import Typography from '@mui/material/Typography'
+import IconButton from '@mui/material/IconButton'
+import Tooltip from '@mui/material/Tooltip'
+import CheckIcon from '@mui/icons-material/Check'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined'
 import ScheduleIcon from '@mui/icons-material/Schedule'
@@ -477,21 +480,38 @@ const Builder = () => {
                     label="Shareable URL"
                     fullWidth
                     value={fullUrl}
-                    slotProps={{ input: { readOnly: true } }}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <Button
-                            variant="outlined"
-                            size="small"
-                            startIcon={<ContentCopyIcon />}
-                            onClick={copy}
-                            disabled={!canStart}
-                          >
-                            Copy
-                          </Button>
-                        </InputAdornment>
-                      ),
+                    slotProps={{
+                      input: {
+                        readOnly: true,
+                        endAdornment: (
+                          <InputAdornment position="end">
+                            <Tooltip
+                              title={
+                                copyState === 'copied'
+                                  ? 'Copied!'
+                                  : copyState === 'error'
+                                    ? 'Copy failed'
+                                    : 'Copy link to clipboard'
+                              }
+                            >
+                              <span>
+                                <IconButton
+                                  aria-label="copy link"
+                                  onClick={copy}
+                                  disabled={!canStart}
+                                  edge="end"
+                                >
+                                  {copyState === 'copied' ? (
+                                    <CheckIcon color="success" />
+                                  ) : (
+                                    <ContentCopyIcon />
+                                  )}
+                                </IconButton>
+                              </span>
+                            </Tooltip>
+                          </InputAdornment>
+                        ),
+                      },
                     }}
                   />
                 </CardContent>
