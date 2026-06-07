@@ -57,7 +57,7 @@ jobs:
         with:
           branch: gh-pages
           folder: dist
-          target-folder: ${{ github.ref_name == 'main' && '' || steps.get-slug.outputs.slug }}
+          target-folder: ${{ github.ref_name == 'main' && '.' || steps.get-slug.outputs.slug }}
           clean: ${{ github.ref_name != 'main' }}
 
       - name: Trigger deployment on main
