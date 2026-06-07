@@ -2,13 +2,15 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches:
+      - '**'
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
   pages: write
   id-token: write
+  actions: write
 
 # Allow only one concurrent deployment, skipping runs queued between an
 # in-progress run and the latest queued run.
@@ -16,8 +18,12 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build:
+    if: github.ref_name != 'gh-pages' && github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -40,21 +46,196 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Get branch slug
+        id: get-slug
+        run: |
+          SLUG=$(echo "${{ github.ref_name }}" | tr '[:upper:]' '[:lower:]' | sed -E 's/[^a-z0-9]+/-/g' | sed -E 's/^-+|-+$//g')
+          echo "slug=$SLUG" >> $GITHUB_OUTPUT
+
+      - name: Deploy to gh-pages branch
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: dist
+          target-folder: ${{ github.ref_name == 'main' && '' || steps.get-slug.outputs.slug }}
+          clean: ${{ github.ref_name != 'main' }}
+
+      - name: Trigger deployment on main
+        if: github.ref_name != 'main'
+        run: |
+          gh workflow run deploy-pages.yml --ref main
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy:
+    needs: build
+    if: |
+      always() &&
+      !failure() &&
+      !cancelled() &&
+      github.ref_name == 'main' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+
+      - name: Generate branch index page
+        run: |
+          cat << 'EOF' > branches.html
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+            <title>Countdown Timer - Deployed Branches</title>
+            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+            <style>
+              :root {
+                --bg: #0f172a;
+                --card-bg: rgba(255, 255, 255, 0.03);
+                --card-border: rgba(255, 255, 255, 0.08);
+                --text: #f8fafc;
+                --text-muted: #94a3b8;
+                --primary: #3b82f6;
+                --primary-hover: #60a5fa;
+              }
+              body {
+                margin: 0;
+                padding: 0;
+                background-color: var(--bg);
+                color: var(--text);
+                font-family: 'Inter', sans-serif;
+                min-height: 100vh;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+              }
+              .container {
+                max-width: 600px;
+                width: 100%;
+                padding: 2rem;
+                box-sizing: border-box;
+                text-align: center;
+              }
+              h1 {
+                font-size: 2.5rem;
+                font-weight: 700;
+                margin-bottom: 0.5rem;
+                background: linear-gradient(to right, #60a5fa, #3b82f6);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+                letter-spacing: -0.02em;
+              }
+              .subtitle {
+                color: var(--text-muted);
+                margin-bottom: 2rem;
+                font-size: 1.1rem;
+              }
+              .branch-list {
+                display: flex;
+                flex-direction: column;
+                gap: 0.75rem;
+                text-align: left;
+              }
+              .branch-card {
+                background: var(--card-bg);
+                border: 1px solid var(--card-border);
+                border-radius: 0.75rem;
+                padding: 1rem 1.25rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                text-decoration: none;
+                color: var(--text);
+                transition: all 0.2s ease;
+              }
+              .branch-card:hover {
+                background: rgba(255, 255, 255, 0.06);
+                border-color: var(--primary);
+                transform: translateY(-1px);
+              }
+              .branch-name {
+                font-weight: 500;
+                font-size: 1rem;
+              }
+              .branch-tag {
+                font-size: 0.75rem;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                padding: 0.25rem 0.5rem;
+                border-radius: 9999px;
+                background: rgba(59, 130, 246, 0.1);
+                color: var(--primary-hover);
+                font-weight: 600;
+              }
+              .branch-tag.main {
+                background: rgba(16, 185, 129, 0.1);
+                color: #34d399;
+              }
+              .arrow {
+                color: var(--text-muted);
+                font-weight: bold;
+                transition: transform 0.2s ease;
+              }
+              .branch-card:hover .arrow {
+                transform: translateX(3px);
+                color: var(--primary-hover);
+              }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>Countdown Timer</h1>
+              <p class="subtitle">Select a deployed branch preview below</p>
+              <div class="branch-list">
+                <a href="./" class="branch-card">
+                  <span class="branch-name">Production (main)</span>
+                  <span style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span class="branch-tag main">main</span>
+                    <span class="arrow">&rarr;</span>
+                  </span>
+                </a>
+          EOF
+
+          # Loop through and append branch cards
+          for dir in *; do
+            if [ -d "$dir" ] && [ "$dir" != "assets" ] && [ "$dir" != "icons" ] && [ -f "$dir/index.html" ]; then
+              tag_class="branch-tag"
+              if [ "$dir" = "develop" ]; then
+                tag_class="branch-tag main"
+              fi
+              echo "      <a href=\"./$dir/\" class=\"branch-card\">" >> branches.html
+              echo "        <span class=\"branch-name\">$dir</span>" >> branches.html
+              echo "        <span style=\"display: flex; align-items: center; gap: 0.75rem;\">" >> branches.html
+              echo "          <span class=\"$tag_class\">$dir</span>" >> branches.html
+              echo "          <span class=\"arrow\">&rarr;</span>" >> branches.html
+              echo "        </span>" >> branches.html
+              echo "      </a>" >> branches.html
+            fi
+          done
+
+          cat << 'EOF' >> branches.html
+              </div>
+            </div>
+          </body>
+          </html>
+          EOF
+
       - name: Configure Pages
         uses: actions/configure-pages@v5
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./dist
+          path: .
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4

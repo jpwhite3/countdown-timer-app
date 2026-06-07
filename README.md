@@ -1,6 +1,6 @@
 # Countdown Timer
 
-This is a simple webapp built with React and CoreUI. It allows you to set a date-time in the future and start a countdown timer from the current date-time.
+This is a simple webapp built with React and Material UI. It allows you to set a date-time in the future and start a countdown timer from the current date-time.
 
 ## TL;DR
 
@@ -13,6 +13,7 @@ This is a simple webapp built with React and CoreUI. It allows you to set a date
 - [Quick Start](#quick-start)
 - [Installation](#installation)
 - [Basic usage](#basic-usage)
+- [Contributing & AI Agent Workflows](#contributing--ai-agent-workflows)
 - [Copyright and License](#copyright-and-license)
 
 ## Quick Start
@@ -59,9 +60,14 @@ $ npm run preview
 $ npm test
 ```
 
+## Contributing & AI Agent Workflows
+
+Contributions are welcome! This repository uses **Spec Kit (speckit)** to manage feature development systematically with AI agents. 
+
+Please read [CONTRIBUTION.md](file:///Users/jpwhite/Code/countdown-timer-app/CONTRIBUTION.md) for full instructions on configuring your AI agent, working with the project constitution, and following our development lifecycle.
+
 ## Copyright and License
 
 copyright 2022 JP White.
 
 Code released under [the MIT license](https://github.com/jpwhite3/countdown-timer-app/blob/main/LICENSE).
-There is only one limitation you can't can’t re-distribute the CoreUI as stock. You can’t do this if you modify the CoreUI. In past we faced some problems with persons who tried to sell CoreUI based templates.

@@ -1,26 +1,35 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import {
-  CButton,
-  CCard,
-  CCardBody,
-  CCardFooter,
-  CCardHeader,
-  CCardText,
-  CCol,
-  CContainer,
-  CForm,
-  CFormCheck,
-  CFormInput,
-  CFormLabel,
-  CFormSelect,
-  CInputGroup,
-  CInputGroupText,
-  CNav,
-  CNavItem,
-  CNavLink,
-  CRow,
-} from '@coreui/react'
+import Alert from '@mui/material/Alert'
+import Box from '@mui/material/Box'
+import Button from '@mui/material/Button'
+import Card from '@mui/material/Card'
+import CardActions from '@mui/material/CardActions'
+import CardContent from '@mui/material/CardContent'
+import CardHeader from '@mui/material/CardHeader'
+import Checkbox from '@mui/material/Checkbox'
+import FormControl from '@mui/material/FormControl'
+import FormControlLabel from '@mui/material/FormControlLabel'
+import FormHelperText from '@mui/material/FormHelperText'
+import Grid from '@mui/material/Grid'
+import InputAdornment from '@mui/material/InputAdornment'
+import MenuItem from '@mui/material/MenuItem'
+import Paper from '@mui/material/Paper'
+import Slider from '@mui/material/Slider'
+import Snackbar from '@mui/material/Snackbar'
+import Stack from '@mui/material/Stack'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
+import TextField from '@mui/material/TextField'
+import ToggleButton from '@mui/material/ToggleButton'
+import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
+import Typography from '@mui/material/Typography'
+import ContentCopyIcon from '@mui/icons-material/ContentCopy'
+import PaletteOutlinedIcon from '@mui/icons-material/PaletteOutlined'
+import ScheduleIcon from '@mui/icons-material/Schedule'
+import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined'
+import VolumeUpOutlinedIcon from '@mui/icons-material/VolumeUpOutlined'
+import AppShell from '../components/AppShell'
 import { buildTimerSearch, DEFAULT_DIM, effectiveDim } from '../lib/timerParams'
 import { unlockAudio } from '../lib/audioCues'
 import { useCountdown } from '../lib/useCountdown'
@@ -46,6 +55,41 @@ function datetimeLocalToIso(dl) {
   return d.toISOString()
 }
 
+function ColorPickerField({ id, label, value, onChange, helperText }) {
+  return (
+    <TextField
+      id={id}
+      label={label}
+      fullWidth
+      value={value}
+      onChange={onChange}
+      helperText={helperText}
+      slotProps={{
+        input: {
+          startAdornment: (
+            <InputAdornment position="start">
+              <input
+                type="color"
+                aria-label={`${label} picker`}
+                value={value}
+                onChange={onChange}
+                style={{
+                  width: 36,
+                  height: 36,
+                  border: 'none',
+                  background: 'transparent',
+                  cursor: 'pointer',
+                  padding: 0,
+                }}
+              />
+            </InputAdornment>
+          ),
+        },
+      }}
+    />
+  )
+}
+
 const Builder = () => {
   const location = useLocation()
   const navigate = useNavigate()
@@ -66,14 +110,8 @@ const Builder = () => {
   const [overtime, setOvertime] = useState(false)
   const [copyState, setCopyState] = useState('idle')
 
-  // Only emit `dim` when it differs from the URL default. The disabled case
-  // emits `dim=0` explicitly (that's the documented off switch); the
-  // enabled-at-default-intensity case omits the param entirely so URLs stay
-  // tidy when the user accepted the defaults.
   const dimParam = !dimEnabled ? 0 : dimIntensity === DEFAULT_DIM ? undefined : dimIntensity
 
-  // Live preview state: synthesize a target so the preview always has
-  // something to show, even before the user types a valid input.
   const previewTarget = useMemo(() => {
     if (mode === 'minutes' && Number(minutes) > 0) {
       return new Date(Date.now() + Number(minutes) * 60_000)
@@ -86,11 +124,8 @@ const Builder = () => {
   }, [mode, minutes, datetimeLocal])
 
   const previewCountdown = useCountdown(previewTarget, { allowOvertime: overtime })
-
   const previewDim = effectiveDim({ dim: dimParam ?? null })
 
-  // Mirror the safeUrl filter that parseTimerParams applies in production,
-  // so a user typing a `javascript:` URL never reaches the <img>/<video>.
   const previewBgUrl = useMemo(() => {
     const v = (bgUrl || '').trim()
     if (!v || typeof window === 'undefined') return null
@@ -145,9 +180,6 @@ const Builder = () => {
 
   const start = () => {
     if (!canStart) return
-    // Unlock the Web Audio context inside this user gesture so the timer
-    // page can play chimes/ticks without needing another tap. The
-    // AudioContext singleton survives the hash-route navigation.
     if (audio) unlockAudio()
     navigate(`/timer${search ? '?' + search : ''}`)
   }
@@ -168,306 +200,282 @@ const Builder = () => {
   }, [copyState])
 
   return (
-    <CContainer sm className="py-3">
-      <CCard className="shadow rounded">
-        <CCardHeader className="fs-3 fw-semibold">Countdown Timer</CCardHeader>
-        <CCardBody>
-          {hasError === 'missing-time' ? (
-            <CCardText className="text-warning">
-              That timer link was missing a valid time. Build a new one below.
-            </CCardText>
-          ) : (
-            <CCardText>
-              Build a shareable countdown timer. Configure when it ends and how it looks below, then
-              copy the URL or click Start.
-            </CCardText>
-          )}
+    <AppShell>
+      <Stack spacing={3}>
+        {hasError === 'missing-time' ? (
+          <Alert severity="warning">
+            That timer link was missing a valid time. Build a new one below.
+          </Alert>
+        ) : (
+          <Typography color="text.secondary">
+            Build a shareable countdown timer. Configure when it ends and how it looks below, then
+            copy the URL or click Start.
+          </Typography>
+        )}
 
-          <div className="mb-4">
-            <CFormLabel className="fw-semibold">Preview</CFormLabel>
-            <TimerPreview
-              title={title}
-              countdown={previewCountdown}
-              bgColor={bgColor}
-              textColor={textColor}
-              bgUrl={previewBgUrl}
-              layout={layout}
-              dim={previewDim}
-            />
-            <div className="form-text text-center mt-2">
+        <Card>
+          <CardHeader title="Preview" />
+          <CardContent>
+            <Paper variant="outlined" sx={{ overflow: 'hidden' }}>
+              <TimerPreview
+                title={title}
+                countdown={previewCountdown}
+                bgColor={bgColor}
+                textColor={textColor}
+                bgUrl={previewBgUrl}
+                layout={layout}
+                dim={previewDim}
+              />
+            </Paper>
+            <FormHelperText sx={{ textAlign: 'center', mt: 1 }}>
               Updates live as you change settings. Audio, flash, and the QR code are omitted.
-            </div>
-          </div>
+            </FormHelperText>
+          </CardContent>
+        </Card>
 
-          <CNav variant="tabs" role="tablist" className="mb-3">
-            <CNavItem>
-              <CNavLink
-                role="tab"
-                active={mode === 'minutes'}
-                onClick={() => setMode('minutes')}
-                style={{ cursor: 'pointer' }}
-              >
-                Minutes from now
-              </CNavLink>
-            </CNavItem>
-            <CNavItem>
-              <CNavLink
-                role="tab"
-                active={mode === 'timestamp'}
-                onClick={() => setMode('timestamp')}
-                style={{ cursor: 'pointer' }}
-              >
-                Specific date and time
-              </CNavLink>
-            </CNavItem>
-          </CNav>
+        <Card>
+          <CardHeader avatar={<ScheduleIcon color="primary" />} title="Duration" />
+          <CardContent>
+            <Tabs
+              value={mode}
+              onChange={(_, v) => setMode(v)}
+              sx={{ mb: 3, borderBottom: 1, borderColor: 'divider' }}
+            >
+              <Tab label="Minutes from now" value="minutes" />
+              <Tab label="Specific date and time" value="timestamp" />
+            </Tabs>
 
-          <CForm>
             {mode === 'minutes' ? (
-              <>
-                <CRow className="mb-2">
-                  <CCol>
-                    <CFormLabel htmlFor="minutes-input">Minutes</CFormLabel>
-                    <CFormInput
-                      id="minutes-input"
-                      type="number"
-                      min="1"
-                      value={minutes}
-                      onChange={(e) => setMinutes(e.target.value)}
-                    />
-                  </CCol>
-                </CRow>
-                <CRow className="g-2 mb-3">
-                  {QUICK_MINUTES.map((m) => (
-                    <CCol xs={4} sm={2} key={m}>
-                      <CButton
-                        color="secondary"
-                        variant="outline"
-                        className="w-100"
-                        size="sm"
-                        onClick={() => setMinutes(String(m))}
-                      >
-                        {m} min
-                      </CButton>
-                    </CCol>
-                  ))}
-                </CRow>
-              </>
-            ) : (
-              <CRow className="mb-3">
-                <CCol>
-                  <CFormLabel htmlFor="datetime-input">Date and time</CFormLabel>
-                  <CFormInput
-                    id="datetime-input"
-                    type="datetime-local"
-                    value={datetimeLocal}
-                    onChange={(e) => setDatetimeLocal(e.target.value)}
-                  />
-                  <div className="form-text">
-                    Uses your local timezone. The timer URL will encode it as an ISO timestamp.
-                  </div>
-                </CCol>
-              </CRow>
-            )}
-
-            <hr />
-
-            <h2 className="fs-5 mb-3">Appearance (optional)</h2>
-
-            <CRow className="mb-3">
-              <CCol>
-                <CFormLabel htmlFor="title-input">Title</CFormLabel>
-                <CFormInput
-                  id="title-input"
-                  type="text"
-                  placeholder="e.g. Lunch break"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
+              <Stack spacing={2}>
+                <TextField
+                  id="minutes-input"
+                  label="Minutes"
+                  type="number"
+                  inputProps={{ min: 1 }}
+                  value={minutes}
+                  onChange={(e) => setMinutes(e.target.value)}
+                  sx={{ maxWidth: 200 }}
                 />
-              </CCol>
-            </CRow>
+                <ToggleButtonGroup
+                  exclusive
+                  size="small"
+                  value={minutes}
+                  onChange={(_, v) => v && setMinutes(v)}
+                  sx={{ flexWrap: 'wrap', gap: 1 }}
+                >
+                  {QUICK_MINUTES.map((m) => (
+                    <ToggleButton key={m} value={String(m)} sx={{ px: 2 }}>
+                      {m} min
+                    </ToggleButton>
+                  ))}
+                </ToggleButtonGroup>
+              </Stack>
+            ) : (
+              <TextField
+                id="datetime-input"
+                label="Date and time"
+                type="datetime-local"
+                fullWidth
+                value={datetimeLocal}
+                onChange={(e) => setDatetimeLocal(e.target.value)}
+                helperText="Uses your local timezone. The timer URL will encode it as an ISO timestamp."
+                slotProps={{ inputLabel: { shrink: true } }}
+              />
+            )}
+          </CardContent>
+        </Card>
 
-            <CRow className="mb-3">
-              <CCol md={6} className="mb-3 mb-md-0">
-                <CFormLabel htmlFor="bg-color-input">Background color</CFormLabel>
-                <div className="form-text mb-1">
-                  Sits behind the background asset. Visible through transparent regions of the
-                  asset, or by itself when no asset is set.
-                </div>
-                <CInputGroup>
-                  <CInputGroupText style={{ padding: 0 }}>
-                    <input
-                      type="color"
-                      aria-label="Background color picker"
-                      value={bgColor}
-                      onChange={(e) => setBgColor(e.target.value)}
-                      style={{
-                        width: 36,
-                        height: 36,
-                        border: 'none',
-                        background: 'transparent',
-                        cursor: 'pointer',
-                      }}
-                    />
-                  </CInputGroupText>
-                  <CFormInput
+        <Card>
+          <CardHeader
+            avatar={<PaletteOutlinedIcon color="primary" />}
+            title="Appearance"
+            subheader="Optional"
+          />
+          <CardContent>
+            <Stack spacing={3}>
+              <TextField
+                id="title-input"
+                label="Title"
+                placeholder="e.g. Lunch break"
+                fullWidth
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+              />
+
+              <Grid container spacing={2}>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <ColorPickerField
                     id="bg-color-input"
-                    type="text"
+                    label="Background color"
                     value={bgColor}
                     onChange={(e) => setBgColor(e.target.value)}
+                    helperText="Sits behind the background asset. Visible through transparent regions of the asset, or by itself when no asset is set."
                   />
-                </CInputGroup>
-              </CCol>
-              <CCol md={6}>
-                <CFormLabel htmlFor="text-color-input">Text color</CFormLabel>
-                <CInputGroup>
-                  <CInputGroupText style={{ padding: 0 }}>
-                    <input
-                      type="color"
-                      aria-label="Text color picker"
-                      value={textColor}
-                      onChange={(e) => setTextColor(e.target.value)}
-                      style={{
-                        width: 36,
-                        height: 36,
-                        border: 'none',
-                        background: 'transparent',
-                        cursor: 'pointer',
-                      }}
-                    />
-                  </CInputGroupText>
-                  <CFormInput
+                </Grid>
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <ColorPickerField
                     id="text-color-input"
-                    type="text"
+                    label="Text color"
                     value={textColor}
                     onChange={(e) => setTextColor(e.target.value)}
                   />
-                </CInputGroup>
-              </CCol>
-            </CRow>
+                </Grid>
+              </Grid>
 
-            <CRow className="mb-3">
-              <CCol>
-                <CFormLabel htmlFor="bg-url-input">Background URL</CFormLabel>
-                <CFormInput
-                  id="bg-url-input"
-                  type="url"
-                  placeholder="https://example.com/image.gif or https://example.com/video.mp4"
-                  value={bgUrl}
-                  onChange={(e) => setBgUrl(e.target.value)}
-                />
-                <div className="form-text">
-                  Any image (JPEG, PNG, GIF, APNG, WebP, AVIF, SVG — animated formats play
-                  automatically) or video (MP4, WebM, MOV, OGV) URL the browser can render natively.
-                  Transparent regions reveal the background color below.
-                </div>
-              </CCol>
-            </CRow>
+              <TextField
+                id="bg-url-input"
+                label="Background URL"
+                type="url"
+                placeholder="https://example.com/image.gif or https://example.com/video.mp4"
+                fullWidth
+                value={bgUrl}
+                onChange={(e) => setBgUrl(e.target.value)}
+                helperText="Any image (JPEG, PNG, GIF, APNG, WebP, AVIF, SVG — animated formats play automatically) or video (MP4, WebM, MOV, OGV) URL the browser can render natively. Transparent regions reveal the background color below."
+              />
 
-            <CRow className="mb-3">
-              <CCol md={6}>
-                <CFormLabel htmlFor="layout-select">Layout</CFormLabel>
-                <CFormSelect
-                  id="layout-select"
-                  value={layout}
-                  onChange={(e) => setLayout(e.target.value)}
-                >
-                  <option value="">Responsive (default)</option>
-                  <option value="mobile">Mobile</option>
-                  <option value="widescreen">Widescreen</option>
-                </CFormSelect>
-              </CCol>
-            </CRow>
+              <TextField
+                id="layout-select"
+                label="Layout"
+                select
+                value={layout}
+                onChange={(e) => setLayout(e.target.value)}
+                sx={{ maxWidth: 320 }}
+              >
+                <MenuItem value="">Responsive (default)</MenuItem>
+                <MenuItem value="mobile">Mobile</MenuItem>
+                <MenuItem value="widescreen">Widescreen</MenuItem>
+              </TextField>
 
-            <CRow className="mb-3">
-              <CCol>
-                <CFormCheck
-                  id="dim-enabled"
+              <Box>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      id="dim-enabled"
+                      checked={dimEnabled}
+                      onChange={(e) => setDimEnabled(e.target.checked)}
+                    />
+                  }
                   label="Dim background for text contrast"
-                  checked={dimEnabled}
-                  onChange={(e) => setDimEnabled(e.target.checked)}
                 />
-                <div className="form-text mb-2">
+                <FormHelperText sx={{ ml: 4, mt: -0.5 }}>
                   Adds a semi-transparent black layer over the background to keep the timer
                   readable. Turn off for full control over the background appearance.
-                </div>
+                </FormHelperText>
                 {dimEnabled && (
-                  <CInputGroup size="sm" style={{ maxWidth: 360 }}>
-                    <CInputGroupText>Intensity</CInputGroupText>
-                    <input
-                      type="range"
+                  <FormControl fullWidth sx={{ mt: 2, maxWidth: 400 }}>
+                    <Typography variant="body2" color="text.secondary" gutterBottom>
+                      Intensity: {Math.round(dimIntensity * 100)}%
+                    </Typography>
+                    <Slider
                       aria-label="Dim intensity"
-                      min="0.05"
-                      max="0.9"
-                      step="0.05"
+                      min={0.05}
+                      max={0.9}
+                      step={0.05}
                       value={dimIntensity}
-                      onChange={(e) => setDimIntensity(Number(e.target.value))}
-                      className="form-control"
-                      style={{ padding: '0.5rem 0.75rem' }}
+                      onChange={(_, v) => setDimIntensity(v)}
+                      valueLabelDisplay="auto"
+                      valueLabelFormat={(v) => `${Math.round(v * 100)}%`}
                     />
-                    <CInputGroupText style={{ minWidth: 56, justifyContent: 'center' }}>
-                      {Math.round(dimIntensity * 100)}%
-                    </CInputGroupText>
-                  </CInputGroup>
+                  </FormControl>
                 )}
-              </CCol>
-            </CRow>
+              </Box>
+            </Stack>
+          </CardContent>
+        </Card>
 
-            <hr />
+        <Card>
+          <CardHeader avatar={<VolumeUpOutlinedIcon color="primary" />} title="Cues" />
+          <CardContent>
+            <Stack>
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    id="enable-flash"
+                    checked={flash}
+                    onChange={(e) => setFlash(e.target.checked)}
+                  />
+                }
+                label="Visual flash at 1:00 and 0:30; red background in the final 10 seconds"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    id="enable-audio"
+                    checked={audio}
+                    onChange={(e) => setAudio(e.target.checked)}
+                  />
+                }
+                label="Audio cues: chime at 1:00, 0:30, 0:10; tick each second in the final 10; final chime at zero"
+              />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    id="enable-overtime"
+                    checked={overtime}
+                    onChange={(e) => setOvertime(e.target.checked)}
+                  />
+                }
+                label="Continue counting after zero (overtime, shown as a negative number)"
+              />
+            </Stack>
+          </CardContent>
+        </Card>
 
-            <h2 className="fs-5 mb-3">Cues</h2>
-
-            <CRow className="mb-3">
-              <CCol>
-                <CFormCheck
-                  id="enable-flash"
-                  label="Visual flash at 1:00 and 0:30; red background in the final 10 seconds"
-                  checked={flash}
-                  onChange={(e) => setFlash(e.target.checked)}
-                />
-                <CFormCheck
-                  id="enable-audio"
-                  label="Audio cues: chime at 1:00, 0:30, 0:10; tick each second in the final 10; final chime at zero"
-                  checked={audio}
-                  onChange={(e) => setAudio(e.target.checked)}
-                />
-                <CFormCheck
-                  id="enable-overtime"
-                  label="Continue counting after zero (overtime, shown as a negative number)"
-                  checked={overtime}
-                  onChange={(e) => setOvertime(e.target.checked)}
-                />
-              </CCol>
-            </CRow>
-
-            <hr />
-
-            <CRow className="mb-3">
-              <CCol>
-                <CFormLabel htmlFor="share-url">Shareable URL</CFormLabel>
-                <CInputGroup>
-                  <CFormInput id="share-url" type="text" readOnly value={fullUrl} />
-                  <CButton color="secondary" variant="outline" onClick={copy} disabled={!canStart}>
-                    {copyState === 'copied'
-                      ? 'Copied!'
-                      : copyState === 'error'
-                        ? 'Copy failed'
-                        : 'Copy'}
-                  </CButton>
-                </CInputGroup>
-              </CCol>
-            </CRow>
-          </CForm>
-        </CCardBody>
-        <CCardFooter>
-          <div className="d-grid">
-            <CButton color="primary" size="lg" onClick={start} disabled={!canStart}>
+        <Card>
+          <CardHeader avatar={<ShareOutlinedIcon color="primary" />} title="Share & Start" />
+          <CardContent>
+            <TextField
+              id="share-url"
+              label="Shareable URL"
+              fullWidth
+              value={fullUrl}
+              slotProps={{ input: { readOnly: true } }}
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      startIcon={<ContentCopyIcon />}
+                      onClick={copy}
+                      disabled={!canStart}
+                    >
+                      Copy
+                    </Button>
+                  </InputAdornment>
+                ),
+              }}
+            />
+          </CardContent>
+          <CardActions sx={{ px: 2, pb: 2 }}>
+            <Button variant="contained" size="large" fullWidth onClick={start} disabled={!canStart}>
               Start Timer
-            </CButton>
-          </div>
-        </CCardFooter>
-      </CCard>
-    </CContainer>
+            </Button>
+          </CardActions>
+        </Card>
+      </Stack>
+
+      <Snackbar
+        open={copyState === 'copied'}
+        autoHideDuration={1500}
+        onClose={() => setCopyState('idle')}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="success" variant="filled">
+          URL copied to clipboard
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={copyState === 'error'}
+        autoHideDuration={1500}
+        onClose={() => setCopyState('idle')}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert severity="error" variant="filled">
+          Copy failed
+        </Alert>
+      </Snackbar>
+    </AppShell>
   )
 }
 
