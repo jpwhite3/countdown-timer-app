@@ -1,1 +1,0 @@
-import{i as e,t}from"./index-BtTNYnTs.js";e();var n=t(),r=()=>(0,n.jsxs)(`div`,{className:`m-4 text-center`,children:[(0,n.jsx)(`h1`,{className:`display-3`,children:`500`}),(0,n.jsx)(`p`,{className:`fs-4`,children:`Something went wrong on our end. Please try again later.`})]});export{r as default};
