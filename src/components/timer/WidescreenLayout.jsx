@@ -146,7 +146,7 @@ const timeSeparator = {
   marginTop: 'clamp(0.25rem, 1vw, 1rem)',
 }
 
-const WidescreenLayout = ({ title, countdown, qrSlot }) => {
+const WidescreenLayout = ({ title, expiryMessage = 'Time is up!', countdown, qrSlot }) => {
   const segments = formatSegments(countdown)
   const showCompleted = countdown.completed && !countdown.overtime
 
@@ -158,7 +158,7 @@ const WidescreenLayout = ({ title, countdown, qrSlot }) => {
       {title ? <h1 style={titleStyle}>{title}</h1> : null}
       {showCompleted ? (
         <div style={completed} aria-live="polite">
-          Time is up!
+          {expiryMessage}
         </div>
       ) : daysSegment ? (
         <div style={countdownContainer} aria-live="polite">

@@ -25,6 +25,7 @@ function useResolvedLayout(lockedLayout) {
 
 const TimerScreen = ({
   title,
+  expiryMessage,
   countdown,
   layout: lockedLayout,
   bgUrl,
@@ -37,7 +38,7 @@ const TimerScreen = ({
   return (
     <>
       <BackgroundMedia bgUrl={bgUrl} videoBgUrl={videoBgUrl} dim={dim} />
-      <Layout title={title} countdown={countdown} qrSlot={qrSlot} />
+      <Layout title={title} expiryMessage={expiryMessage} countdown={countdown} qrSlot={qrSlot} />
     </>
   )
 }

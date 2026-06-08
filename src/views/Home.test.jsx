@@ -127,5 +127,41 @@ describe('Builder Component', () => {
       })
       expect(screen.queryByTestId('ContentCopyIcon')).toBeNull()
     })
+
+    it('copies the shareable URL with custom expiration message', async () => {
+      render(
+        <Provider store={store}>
+          <HashRouter>
+            <Builder />
+          </HashRouter>
+        </Provider>,
+      )
+
+      const messageInput = screen.getByLabelText(/expiration message/i)
+      fireEvent.change(messageInput, { target: { value: 'Coffee Time!' } })
+
+      const copyBtn = screen.getByRole('button', { name: /copy link/i })
+      fireEvent.click(copyBtn)
+
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+        expect.stringContaining('expiry_message=Coffee+Time%21'),
+      )
+    })
+  })
+
+  it('updates expiration message input correctly', async () => {
+    render(
+      <Provider store={store}>
+        <HashRouter>
+          <Builder />
+        </HashRouter>
+      </Provider>,
+    )
+
+    const messageInput = screen.getByLabelText(/expiration message/i)
+    expect(messageInput.value).toBe('')
+
+    fireEvent.change(messageInput, { target: { value: 'Take a break!' } })
+    expect(messageInput.value).toBe('Take a break!')
   })
 })

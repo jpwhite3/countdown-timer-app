@@ -70,7 +70,7 @@ const footer = {
   gap: '0.75rem',
 }
 
-const MobileLayout = ({ title, countdown, qrSlot }) => {
+const MobileLayout = ({ title, expiryMessage = 'Time is up!', countdown, qrSlot }) => {
   const segments = formatSegments(countdown)
   const showCompleted = countdown.completed && !countdown.overtime
   return (
@@ -78,7 +78,7 @@ const MobileLayout = ({ title, countdown, qrSlot }) => {
       {title ? <h1 style={titleStyle}>{title}</h1> : null}
       {showCompleted ? (
         <div style={completed} aria-live="polite">
-          Time is up!
+          {expiryMessage}
         </div>
       ) : (
         <div style={stack} aria-live="polite">

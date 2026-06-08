@@ -392,3 +392,35 @@ describe('dim in parseTimerParams + buildTimerSearch', () => {
     expect(new URLSearchParams(s).get('dim')).toBe('0')
   })
 })
+
+describe('expiryMessage in parseTimerParams + buildTimerSearch', () => {
+  const NOW = Date.parse('2026-06-01T12:00:00Z')
+
+  it('parses expiry_message from URL', () => {
+    const params = parseTimerParams('minutes=1&expiry_message=Custom+Message%21', { now: NOW })
+    expect(params.expiryMessage).toBe('Custom Message!')
+  })
+
+  it('defaults to "Time is up!" when expiry_message is missing, empty, or whitespace-only', () => {
+    expect(parseTimerParams('minutes=1', { now: NOW }).expiryMessage).toBe('Time is up!')
+    expect(parseTimerParams('minutes=1&expiry_message=', { now: NOW }).expiryMessage).toBe(
+      'Time is up!',
+    )
+    expect(parseTimerParams('minutes=1&expiry_message=%20%20', { now: NOW }).expiryMessage).toBe(
+      'Time is up!',
+    )
+  })
+
+  it('serializes expiryMessage in buildTimerSearch', () => {
+    const s = buildTimerSearch({ mode: 'minutes', minutes: '5', expiryMessage: 'Meeting over!' })
+    expect(new URLSearchParams(s).get('expiry_message')).toBe('Meeting over!')
+  })
+
+  it('omits expiry_message when empty or whitespace-only in buildTimerSearch', () => {
+    const s1 = buildTimerSearch({ mode: 'minutes', minutes: '5', expiryMessage: '' })
+    expect(new URLSearchParams(s1).has('expiry_message')).toBe(false)
+
+    const s2 = buildTimerSearch({ mode: 'minutes', minutes: '5', expiryMessage: '   ' })
+    expect(new URLSearchParams(s2).has('expiry_message')).toBe(false)
+  })
+})

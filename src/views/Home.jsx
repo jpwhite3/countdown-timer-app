@@ -96,6 +96,7 @@ const Builder = () => {
   const [minutes, setMinutes] = useState('15')
   const [datetimeLocal, setDatetimeLocal] = useState(defaultDatetimeLocal)
   const [title, setTitle] = useState('')
+  const [expiryMessage, setExpiryMessage] = useState('')
   const [bgColor, setBgColor] = useState('#0b0f19')
   const [textColor, setTextColor] = useState('#f5f5f5')
   const [bgUrl, setBgUrl] = useState('')
@@ -151,6 +152,7 @@ const Builder = () => {
         flash,
         audio,
         overtime,
+        expiryMessage,
       }),
     [
       mode,
@@ -165,6 +167,7 @@ const Builder = () => {
       flash,
       audio,
       overtime,
+      expiryMessage,
     ],
   )
 
@@ -302,6 +305,15 @@ const Builder = () => {
                     fullWidth
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
+                  />
+
+                  <TextField
+                    id="expiry-message-input"
+                    label="Expiration Message"
+                    placeholder="e.g. Time is up!"
+                    fullWidth
+                    value={expiryMessage}
+                    onChange={(e) => setExpiryMessage(e.target.value)}
                   />
 
                   <Grid container spacing={2}>
