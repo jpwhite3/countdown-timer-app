@@ -162,6 +162,7 @@ export function parseTimerParams(search, { now = Date.now() } = {}) {
     flash: parseBoolParam(params.get('enable_flash')),
     audio: parseBoolParam(params.get('enable_audio')),
     overtime: parseBoolParam(params.get('enable_overtime')),
+    expiryMessage: (params.get('expiry_message') ?? '').trim() || 'Time is up!',
     error: target ? null : 'missing-time',
   }
 }
@@ -204,6 +205,7 @@ export function buildTimerSearch({
   flash,
   audio,
   overtime,
+  expiryMessage,
 } = {}) {
   const params = new URLSearchParams()
 
@@ -236,6 +238,9 @@ export function buildTimerSearch({
   if (flash) params.set('enable_flash', '1')
   if (audio) params.set('enable_audio', '1')
   if (overtime) params.set('enable_overtime', '1')
+
+  const em = (expiryMessage ?? '').trim()
+  if (em) params.set('expiry_message', em)
 
   return params.toString()
 }

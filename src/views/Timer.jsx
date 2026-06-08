@@ -85,6 +85,7 @@ const TimerView = () => {
     <>
       <TimerScreen
         title={params.title}
+        expiryMessage={params.expiryMessage}
         countdown={countdown}
         layout={params.layout}
         bgUrl={flashing || critical ? null : params.bgUrl}
